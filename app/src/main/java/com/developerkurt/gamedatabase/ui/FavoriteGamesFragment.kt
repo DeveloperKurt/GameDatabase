@@ -8,8 +8,9 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.developerkurt.gamedatabase.databinding.FavoriteGamesFragmentBinding
 import com.developerkurt.gamedatabase.viewmodels.FavoriteGamesViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
-
+@AndroidEntryPoint
 class FavoriteGamesFragment : Fragment()
 {
     private val viewModel: FavoriteGamesViewModel by viewModels()

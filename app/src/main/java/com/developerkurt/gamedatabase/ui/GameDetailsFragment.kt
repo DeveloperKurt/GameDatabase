@@ -9,7 +9,9 @@ import androidx.fragment.app.viewModels
 
 import com.developerkurt.gamedatabase.databinding.GameDetailsFragmentMotionSceneStartBinding
 import com.developerkurt.gamedatabase.viewmodels.GameDetailsViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class GameDetailsFragment : Fragment()
 {
 

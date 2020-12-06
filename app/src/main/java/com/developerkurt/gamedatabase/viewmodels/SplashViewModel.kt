@@ -4,20 +4,18 @@ import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import timber.log.Timber
-import java.util.*
 
 class SplashViewModel @ViewModelInject internal constructor() : ViewModel()
 {
 
-    private var isLoadedLiveData = MutableLiveData(false)
+    private var isLoadedLiveData = MutableLiveData(true)
 
     fun getIsLoadedLiveData(): LiveData<Boolean> = isLoadedLiveData
 
     fun load()
     {
         //TODO change this to the actual implementation
-
+/*
         val timer = Timer()
         timer.schedule(object : TimerTask()
         {
@@ -29,6 +27,6 @@ class SplashViewModel @ViewModelInject internal constructor() : ViewModel()
 
             }
 
-        }, 2000)
+        }, 2000)*/
     }
 }

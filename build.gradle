@@ -44,6 +44,9 @@ buildscript {
         uiAutomatorVersion = '2.2.0'
         viewPagerVersion = '1.0.0'
         timberVersion = '4.7.1'
+        retrofitVersion ='2.5.0'
+        gsonVersion ='2.8.4'
+
     }
 
     dependencies {

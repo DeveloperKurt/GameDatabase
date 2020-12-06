@@ -9,8 +9,10 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.Navigation
 import com.developerkurt.gamedatabase.databinding.SplashFragmentBinding
 import com.developerkurt.gamedatabase.viewmodels.SplashViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 
+@AndroidEntryPoint
 class SplashFragment : Fragment()
 {
 
@@ -42,7 +44,6 @@ class SplashFragment : Fragment()
             }
         })
 
-        Timber.d("test")
         return view
     }
 

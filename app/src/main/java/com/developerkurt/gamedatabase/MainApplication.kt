@@ -1,7 +1,6 @@
 package com.developerkurt.gamedatabase
 
 import android.app.Application
-import androidx.databinding.library.BuildConfig
 import dagger.hilt.android.HiltAndroidApp
 import timber.log.Timber
 
