@@ -35,12 +35,9 @@
         android:name="com.developerkurt.gamedatabase.ui.GameDetailsFragment"
         android:label="game_details_fragment"
         tools:layout="@layout/game_details_fragment_motion_scene_end">
-        <action
-            android:id="@+id/action_gameDetailsFragment_to_gameListFragment"
-            app:destination="@id/gameListFragment" />
-        <action
-            android:id="@+id/action_gameDetailsFragment_to_favoriteGamesFragment"
-            app:destination="@id/favoriteGamesFragment" />
+        <argument
+            android:name="gameId"
+            app:argType="integer" />
     </fragment>
     <fragment
         android:id="@+id/favoriteGamesFragment"

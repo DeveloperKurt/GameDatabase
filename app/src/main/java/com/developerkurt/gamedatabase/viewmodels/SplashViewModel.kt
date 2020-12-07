@@ -15,13 +15,12 @@ class SplashViewModel @ViewModelInject internal constructor() : ViewModel()
     fun load()
     {
         //TODO change this to the actual implementation
-/*
-        val timer = Timer()
+/*        val timer = Timer()
         timer.schedule(object : TimerTask()
         {
             override fun run()
             {
-                Timber.i("Display-Data is loaded")
+          //      Timber.i("Display-Data is loaded")
 
                 isLoadedLiveData.postValue(true)
 

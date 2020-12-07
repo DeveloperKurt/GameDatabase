@@ -2,7 +2,7 @@ package com.developerkurt.gamedatabase.data.api
 
 import com.developerkurt.gamedatabase.BuildConfig
 import com.developerkurt.gamedatabase.data.model.GameDataList
-import com.developerkurt.gamedatabase.data.model.GameDetailsData
+import com.developerkurt.gamedatabase.data.model.GameDetails
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Call
@@ -22,7 +22,7 @@ interface GameAPIService
 
     @Headers(HEADER_KEY, HEADER_HOST)
     @GET("games/{game_id}")
-    fun getGameDetails(@Path("game_id") game_id: String): Call<GameDetailsData>
+    fun getGameDetails(@Path("game_id") game_id: String): Call<GameDetails>
 
     companion object
     {

@@ -1,7 +1,7 @@
 package com.developerkurt.gamedatabase.data
 
 import com.developerkurt.gamedatabase.data.model.GameData
-import com.developerkurt.gamedatabase.data.model.GameDetailsData
+import com.developerkurt.gamedatabase.data.model.GameDetails
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
@@ -14,7 +14,7 @@ abstract class BaseRepository
 {
 
     //TODO [Before Release] Change to 1 min
-    protected var refreshIntervalInMs = 10000L
+    protected var refreshIntervalInMs = 20000L
 
 
     /**
@@ -37,7 +37,7 @@ abstract class BaseRepository
      */
     abstract protected suspend fun cacheGameList(gameDataList: List<GameData>): Job
 
-    abstract suspend fun fetchGameDetailsOnceFromDatabase(gameId: Int, errorListener: ErrorListener? = null): Deferred<GameDetailsData?>
+    abstract suspend fun fetchGameDetailsOnceFromDatabase(gameId: Int, errorListener: ErrorListener? = null): Deferred<GameDetails?>
 
     abstract suspend fun addGameToFavorites(gameId: Int): Job
     abstract suspend fun removeGameFromFavorites(gameId: Int): Job

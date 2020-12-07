@@ -3,10 +3,11 @@ package com.developerkurt.gamedatabase.data
 import android.annotation.SuppressLint
 import com.developerkurt.gamedatabase.data.api.GameAPIService
 import com.developerkurt.gamedatabase.data.model.GameData
-import com.developerkurt.gamedatabase.data.model.GameDetailsData
+import com.developerkurt.gamedatabase.data.model.GameDetails
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import timber.log.Timber
 import kotlin.coroutines.coroutineContext
 
@@ -61,7 +62,7 @@ class GameRepository constructor(private val apiService: GameAPIService) : BaseR
                 delay(refreshIntervalInMs)
             }
 
-        }
+        }.flowOn(Dispatchers.IO)
     }
 
 
@@ -111,7 +112,7 @@ class GameRepository constructor(private val apiService: GameAPIService) : BaseR
         TODO("Not yet implemented")
     }
 
-    override suspend fun fetchGameDetailsOnceFromDatabase(gameId: Int, errorListener: ErrorListener?): Deferred<GameDetailsData?>
+    override suspend fun fetchGameDetailsOnceFromDatabase(gameId: Int, errorListener: ErrorListener?): Deferred<GameDetails?>
     {
         TODO("Not yet implemented")
     }
