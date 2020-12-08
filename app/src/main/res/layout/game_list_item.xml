@@ -31,7 +31,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:load_circle_image="@{game_data.imageUrl}"
+            app:load_circle_image="@{game_data}"
             tools:srcCompat="@tools:sample/avatars" />
 
         <TextView
