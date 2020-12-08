@@ -33,8 +33,7 @@ class GameListViewModel @ViewModelInject @Inject internal constructor(
 
         }).filterNotNull().collect {
             gameListLiveData.value = it
-            errorLiveData.postValue(false)
-
+            errorLiveData.value = false
         }
     }
 

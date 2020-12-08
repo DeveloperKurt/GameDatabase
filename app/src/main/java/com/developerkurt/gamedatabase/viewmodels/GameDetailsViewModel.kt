@@ -13,9 +13,9 @@ class GameDetailsViewModel @ViewModelInject internal constructor(
         private val gameRepository: GameRepository) : ViewModel()
 {
 
-    private val gameDetailsLiveData = MutableLiveData<GameDetails>()
+    private val gameDetailsLiveData = MutableLiveData<GameDetails?>()
 
-    fun getGameDetailsLiveData(gameId: Int): LiveData<GameDetails>
+    fun getGameDetailsLiveData(gameId: Int): LiveData<GameDetails?>
     {
 
         viewModelScope.launch {

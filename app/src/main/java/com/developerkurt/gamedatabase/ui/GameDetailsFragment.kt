@@ -13,6 +13,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
+import com.developerkurt.gamedatabase.GlideApp
 import com.developerkurt.gamedatabase.R
 import com.developerkurt.gamedatabase.databinding.GameDetailsFragmentMotionSceneStartBinding
 import com.developerkurt.gamedatabase.viewmodels.GameDetailsViewModel
@@ -53,7 +54,7 @@ class GameDetailsFragment : Fragment() {
         })
     }
 
-    //TODO motion layout ignores visibility changes
+    //TODO motion layout ignores the visibility changes
     private fun changeLayoutStateToLoading() {
         binding.progressBar.visibility = View.VISIBLE
         binding.detailsLayout.visibility = View.INVISIBLE
@@ -72,13 +73,13 @@ class GameDetailsFragment : Fragment() {
     }
 
     /**
-     * Decided not to use since I didn't like the end result. Keeping a consistent theme seems to be
+     * Decided to not to use since I didn't like the end result. Keeping a consistent theme seems to be
      * looking way better. But feel free to try it.
      */
     private fun changeBackgroundToDominantImageColor(imageURL: String) {
 
         //Get the cached bitmap to find its dominant color
-        Glide.with(this)
+        GlideApp.with(this)
             .asBitmap()
             .load(imageURL)
             .diskCacheStrategy(DiskCacheStrategy.ALL)

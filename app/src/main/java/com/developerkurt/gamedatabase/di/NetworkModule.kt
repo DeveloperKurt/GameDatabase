@@ -14,7 +14,7 @@ class NetworkModule
 {
     @Singleton
     @Provides
-    fun provideUnsplashService(): GameAPIService
+    fun provideGameAPIService(): GameAPIService
     {
         return GameAPIService.create()
     }

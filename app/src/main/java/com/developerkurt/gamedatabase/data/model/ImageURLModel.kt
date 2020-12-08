@@ -5,6 +5,7 @@ import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
+import com.developerkurt.gamedatabase.GlideApp
 import com.developerkurt.gamedatabase.R
 
 
@@ -24,7 +25,7 @@ abstract class ImageURLModel
 fun loadImage(imageView: ImageView, imageURLModel: ImageURLModel?) {
 
 
-    Glide.with(imageView.getContext())
+    GlideApp.with(imageView.getContext())
         .load(imageURLModel?.imageUrl)
         .diskCacheStrategy(DiskCacheStrategy.ALL)
         .apply(RequestOptions().error(R.drawable.ic_error_robot))
@@ -38,7 +39,7 @@ fun loadImage(imageView: ImageView, imageURLModel: ImageURLModel?) {
  */
 @BindingAdapter("load_circle_image")
 fun loadCircleImage(imageView: ImageView, imageURLModel: ImageURLModel?) {
-    Glide.with(imageView.getContext())
+    GlideApp.with(imageView.getContext())
         .load(imageURLModel?.imageUrl)
         .diskCacheStrategy(DiskCacheStrategy.ALL)
         .apply(RequestOptions().circleCrop().error(R.drawable.ic_error_robot))
