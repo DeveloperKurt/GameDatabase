@@ -14,8 +14,8 @@ abstract class BaseRepository
 {
 
     //TODO [Before Release] Change to 1 min
-    protected var refreshIntervalInMs = 20000L
-
+    var refreshIntervalInMs = 20000L
+        protected set
 
     /**
      * ## Fetch the game data in specified intervals ([refreshIntervalInMs]) and return it if it's different from the cached data
@@ -30,7 +30,7 @@ abstract class BaseRepository
     /**
      * Fetch the game data from the cached local database
      */
-    abstract protected suspend fun fetchCachedGameList(gameDataList: List<GameData>): Deferred<List<GameData>?>
+    abstract protected suspend fun getCachedGameList(): Deferred<List<GameData>?>
 
     /**
      * Cache the give game data list to the local database

@@ -22,7 +22,7 @@ interface GameAPIService
 
     @Headers(HEADER_KEY, HEADER_HOST)
     @GET("games/{game_id}")
-    fun getGameDetails(@Path("game_id") game_id: String): Call<GameDetails>
+    fun getGameDetails(@Path("game_id") game_id: Int): Call<GameDetails>
 
     companion object
     {

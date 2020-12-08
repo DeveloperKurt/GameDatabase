@@ -8,6 +8,7 @@
     app:layoutDescription="@xml/game_details_fragment_scene"
     tools:context=".ui.GameDetailsFragment">
 
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/details_layout"
         android:layout_width="0dp"
@@ -15,6 +16,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
+        android:visibility="visible"
         android:background="@drawable/title_layout_background"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -101,5 +103,15 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <include
+        android:id="@+id/inc_error_layout"
+        layout="@layout/error_layout"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

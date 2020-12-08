@@ -1,5 +1,6 @@
 package com.developerkurt.gamedatabase.data.model
 
+import android.graphics.Bitmap
 import android.widget.ImageView
 import androidx.databinding.BindingAdapter
 import com.bumptech.glide.Glide
@@ -13,23 +14,44 @@ import com.developerkurt.gamedatabase.R
 abstract class ImageURLModel
 {
     abstract val imageUrl: String
+    var imageBitmap: Bitmap? = null
 
 }
 
 @BindingAdapter("load_image")
-fun loadImage(imageView: ImageView, imageUrl: String)
+fun loadImage(imageView: ImageView, imageURLModel: ImageURLModel)
 {
-    Glide.with(imageView.getContext())
-        .load(imageUrl)
-        .apply(RequestOptions().error(R.drawable.ic_error_robot))
-        .into(imageView)
+    if (imageURLModel.imageBitmap == null)
+    {
+        Glide.with(imageView.getContext())
+            .load(imageURLModel.imageUrl)
+            .apply(RequestOptions().error(R.drawable.ic_error_robot))
+            .into(imageView)
+    }
+    else
+    {
+        Glide.with(imageView.getContext())
+            .load(imageURLModel.imageBitmap)
+            .apply(RequestOptions().error(R.drawable.ic_error_robot))
+            .into(imageView)
+    }
 }
 
 @BindingAdapter("load_circle_image")
-fun loadCircleImage(imageView: ImageView, imageUrl: String)
+fun loadCircleImage(imageView: ImageView, imageURLModel: ImageURLModel)
 {
-    Glide.with(imageView.getContext())
-        .load(imageUrl)
-        .apply(RequestOptions().circleCrop().error(R.drawable.ic_error_robot))
-        .into(imageView)
+    if (imageURLModel.imageBitmap == null)
+    {
+        Glide.with(imageView.getContext())
+            .load(imageURLModel.imageUrl)
+            .apply(RequestOptions().circleCrop().error(R.drawable.ic_error_robot))
+            .into(imageView)
+    }
+    else
+    {
+        Glide.with(imageView.getContext())
+            .load(imageURLModel.imageBitmap)
+            .apply(RequestOptions().circleCrop().error(R.drawable.ic_error_robot))
+            .into(imageView)
+    }
 }

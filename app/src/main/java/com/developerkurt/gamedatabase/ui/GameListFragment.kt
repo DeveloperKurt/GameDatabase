@@ -14,6 +14,7 @@ import com.developerkurt.gamedatabase.databinding.GameListFragmentBinding
 import com.developerkurt.gamedatabase.viewmodels.GameListViewModel
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.android.synthetic.main.error_layout.view.*
 import kotlinx.android.synthetic.main.game_list_fragment.*
 import kotlinx.coroutines.launch
 
@@ -68,11 +69,41 @@ class GameListFragment : Fragment(), GameListAdapter.GameClickListener
             imagePagerAdapter.update(it.take(3).map { it.imageUrl })
         })
 
+        viewModel.getErrorLiveData().observe(viewLifecycleOwner, {
+            if (it)
+            {
+                displayErrorLayout()
+            }
+            else
+            {
+                displayDefaultLayout()
+            }
+        })
+
         lifecycleScope.launch {
             viewModel.getLatestGameList()
         }
 
     }
+
+    private fun displayDefaultLayout()
+    {
+        binding.viewPagerGameImages.visibility = View.VISIBLE
+        binding.recyclerViewGameData.visibility = View.VISIBLE
+        binding.tlViewPagerScroll.visibility = View.VISIBLE
+        binding.incErrorLayout.errorLayout.visibility = View.GONE
+    }
+
+    private fun displayErrorLayout(errorMessage: String? = null)
+    {
+        binding.viewPagerGameImages.visibility = View.INVISIBLE
+        binding.recyclerViewGameData.visibility = View.INVISIBLE
+        binding.tlViewPagerScroll.visibility = View.INVISIBLE
+        binding.incErrorLayout.errorLayout.visibility = View.VISIBLE
+        errorMessage?.let { binding.incErrorLayout.errorLayout.tv_error_msg.text = it }
+
+    }
+
 
     override fun onGameClick(gameId: Int)
     {

@@ -31,6 +31,25 @@ class GameDetailsFragment : Fragment()
         return view
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?)
+    {
+        super.onViewCreated(view, savedInstanceState)
+        val gameId = (requireArguments().get("gameId") as Int)
+
+        viewModel.getGameDetailsLiveData(gameId).observe(viewLifecycleOwner, {
+            if (it != null)
+            {
+                binding.gameDetails = it
+                binding.incErrorLayout.errorLayout.visibility = View.GONE
+
+            }
+            else
+            {
+                binding.incErrorLayout.errorLayout.visibility = View.VISIBLE
+            }
+        })
+    }
+
     override fun onDestroyView()
     {
         super.onDestroyView()

@@ -2,6 +2,9 @@ package com.developerkurt.gamedatabase.data.model
 
 import com.google.gson.annotations.SerializedName
 
+/**
+ * TODO test the bitmap field and when downloading the URL check if the bitmap is null first
+ */
 data class GameData(
         @field:SerializedName("id") val id: Int,
         @field:SerializedName("name") val name: String,
