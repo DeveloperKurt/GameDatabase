@@ -41,16 +41,15 @@ class GameListAdapter(val listenerCallback: GameClickListener) : RecyclerView.Ad
         {
             binding.setClickListener {
                 binding.gameData?.let {
-                    listenerCallback.onGameClick(it.id)
+                    listenerCallback.onGameClick(it)
                 }
             }
         }
-
     }
 
     interface GameClickListener
     {
-        fun onGameClick(gameId: Int)
+        fun onGameClick(gameData: GameData)
     }
 
 }

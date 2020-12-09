@@ -10,6 +10,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import com.developerkurt.gamedatabase.adapters.GameListAdapter
 import com.developerkurt.gamedatabase.adapters.ImagePagerAdapter
+import com.developerkurt.gamedatabase.data.model.GameData
 import com.developerkurt.gamedatabase.databinding.GameListFragmentBinding
 import com.developerkurt.gamedatabase.viewmodels.GameListViewModel
 import com.google.android.material.tabs.TabLayoutMediator
@@ -62,6 +63,8 @@ class GameListFragment : Fragment(), GameListAdapter.GameClickListener
 
 
     //TODO Check the lifecycle's effect on LiveData, atm it doesn't emit values when navigated back from a navigationbar fragment
+    //TODO (UPDATE): Probable cause is the bottom nav bar since the same thing is happening to the favorites fragment.
+
     private fun subscribeUi(gameListAdapter: GameListAdapter, imagePagerAdapter: ImagePagerAdapter)
     {
         viewModel.getGameListLiveData().observe(viewLifecycleOwner, {
@@ -105,14 +108,14 @@ class GameListFragment : Fragment(), GameListAdapter.GameClickListener
     }
 
 
-    override fun onGameClick(gameId: Int)
+    override fun onGameClick(gameData: GameData)
     {
-        navigateToGameDetails(gameId)
+        navigateToGameDetails(gameData)
     }
 
-    private fun navigateToGameDetails(gameId: Int)
+    private fun navigateToGameDetails(gameData: GameData)
     {
-        val direction = GameListFragmentDirections.actionGameListFragmentToGameDetailsFragment(gameId)
+        val direction = GameListFragmentDirections.actionGameListFragmentToGameDetailsFragment(gameData.id, gameData.isInFavorites)
         binding.root.findNavController().navigate(direction)
     }
 

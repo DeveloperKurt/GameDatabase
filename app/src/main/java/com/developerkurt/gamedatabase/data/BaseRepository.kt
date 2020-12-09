@@ -17,10 +17,7 @@ abstract class BaseRepository
          */
         LOCAL_UNTIL_STALE,
 
-        /**
-         * Left this one up to you to figure out
-         */
-        NETWORK_ONLY
+
     }
 
     interface ErrorListener

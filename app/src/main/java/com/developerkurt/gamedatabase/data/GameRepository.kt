@@ -42,7 +42,7 @@ class GameRepository private constructor(
             if (gameList != null)
             {
                 Timber.i("Found a local list of games, emitting right away.")
-                gameList!!
+                emit(gameList!!)
             }
             else
             {
@@ -70,20 +70,6 @@ class GameRepository private constructor(
                         TODO("This config is not implemented yet")
                     }
 
-                    RepositoryConfig.NETWORK_ONLY ->
-                    {
-                        gameList = fetchGameListOverNetwork().await()
-                        if (gameList != null)
-                        {
-                            gameList = gameList!!.sortedBy { it.name }
-                            emit(gameList!!)
-                        }
-                        else
-                        {
-                            errorListener?.onError()
-                        }
-
-                    }
 
                 }
             }
@@ -216,7 +202,7 @@ class GameRepository private constructor(
             }
         }
 
-
+    //TODO delete entire old cached data
     private suspend fun cacheGameList(gameDataList: List<GameData>): Job =
         withContext(Dispatchers.IO) {
             return@withContext async {
@@ -225,7 +211,15 @@ class GameRepository private constructor(
         }
 
 
-    private suspend fun gameDataUpdated(gameData: GameData): Job = withContext(Dispatchers.IO) {
+    suspend fun updateIsFavorite(gameDataId: Int, isFavorite: Boolean): Job = withContext(Dispatchers.IO) {
+
+        return@withContext async {
+            roomDatabase.gameDataDao().updateIsFavorite(gameDataId, if (isFavorite) 1 else 0)
+        }
+    }
+
+
+    suspend fun updateGameData(gameData: GameData): Job = withContext(Dispatchers.IO) {
 
         return@withContext async {
             roomDatabase.gameDataDao().update(gameData)
@@ -294,9 +288,7 @@ class GameRepository private constructor(
                     requireNotNull(roomDatabase, { "This config requires a Room database" })
 
                 }
-                RepositoryConfig.NETWORK_ONLY ->
-                {
-                }
+
             }
 
             return GameRepository(

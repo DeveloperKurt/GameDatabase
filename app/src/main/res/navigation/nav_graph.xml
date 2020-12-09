@@ -38,6 +38,9 @@
         <argument
             android:name="gameId"
             app:argType="integer" />
+        <argument
+            android:name="isInFavorites"
+            app:argType="boolean" />
     </fragment>
     <fragment
         android:id="@+id/favoriteGamesFragment"
