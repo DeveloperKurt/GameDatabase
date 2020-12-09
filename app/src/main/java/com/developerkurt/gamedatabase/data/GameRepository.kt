@@ -4,50 +4,118 @@ import android.annotation.SuppressLint
 import com.developerkurt.gamedatabase.data.api.GameAPIService
 import com.developerkurt.gamedatabase.data.model.GameData
 import com.developerkurt.gamedatabase.data.model.GameDetails
+import com.developerkurt.gamedatabase.data.persistence.RoomAppDatabase
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.*
 import timber.log.Timber
-import kotlin.coroutines.coroutineContext
 
-
-class GameRepository constructor(private val apiService: GameAPIService) : BaseRepository()
+//TODO [Before Release] Change refreshIntervalInMs to 1 min
+//TODO coroutinescope is not respected
+/**
+ * @param config Config for the retrieval method of the GameList
+ */
+class GameRepository private constructor(
+    private val apiService: GameAPIService,
+    _roomDatabase: RoomAppDatabase?,
+    private val config: RepositoryConfig,
+    private var refreshIntervalInMs: Long,
+    private var dataExpirationDurationInMs: Long
+) : BaseRepository()
 {
-    private var lastGameList = listOf<GameData>()
+
     private var lastTimeGameListFetched = -1L
 
-    @SuppressLint("BinaryOperationInTimber")
-    override suspend fun getTheLatestGameList(errorListener: ErrorListener?): Flow<List<GameData>>
+    @Volatile
+    private var gameList: List<GameData>? = null
+
+
+    private val roomDatabase = _roomDatabase!!
+
+
+    /**
+     * Fetches the data depending on the provided config
+     */
+    suspend fun getTheLatestGameList(errorListener: ErrorListener?): Flow<List<GameData>>
     {
 
-        var alreadyRetrievedFromNetwork = false
         return flow {
-
-            //TODO launch another async coroutine to return cached if network repository didn't emit it already
-
-
-            while (coroutineContext.isActive)
+            if (gameList != null)
+            {
+                Timber.i("Found a local list of games, emitting right away.")
+                gameList!!
+            }
+            else
             {
 
-                //Fetch new data only when the elapsed time is bigger than the [refreshIntervalInMs]
-                if (System.currentTimeMillis() - lastTimeGameListFetched > refreshIntervalInMs || lastTimeGameListFetched == -1)
+                when (config)
                 {
-                    val deferredLatestList = fetchGameListFromNetwork()
-                    val updatedList = deferredLatestList.await()
+                    RepositoryConfig.LOCAL_FIRST_CONTINUOUS_NETWORK_REFRESH ->
+                    {
+                        val cachedList = getCachedGameList().await()
+                        if (cachedList != null)
+                        {
+                            Timber.i("Found a cached list")
+                            gameList = cachedList.sortedBy { it.name }
+                            emit(gameList!!)
+                        }
+
+                        fetchContinuously(errorListener).collect {
+                            cacheGameList(it)
+                            emit(it)
+                        }
+
+                    }
+                    RepositoryConfig.LOCAL_UNTIL_STALE ->
+                    {
+                        TODO("This config is not implemented yet")
+                    }
+
+                    RepositoryConfig.NETWORK_ONLY ->
+                    {
+                        gameList = fetchGameListOverNetwork().await()
+                        if (gameList != null)
+                        {
+                            gameList = gameList!!.sortedBy { it.name }
+                            emit(gameList!!)
+                        }
+                        else
+                        {
+                            errorListener?.onError()
+                        }
+
+                    }
+
+                }
+            }
+        }
+    }
+
+
+    @SuppressLint("BinaryOperationInTimber")
+    private fun fetchContinuously(errorListener: ErrorListener?): Flow<List<GameData>>
+    {
+
+        return flow {
+            while (currentCoroutineContext().isActive)
+            {
+                //Fetch new data only when the elapsed time is bigger than the [refreshIntervalInMs]
+                if (System.currentTimeMillis() - lastTimeGameListFetched > refreshIntervalInMs || lastTimeGameListFetched == -1L)
+                {
+                    val updatedList = fetchGameListOverNetwork().await()
 
                     if (updatedList != null)
                     {
 
-                        if (lastGameList.isEmpty() || lastGameList != updatedList)
+                        if (gameList == null || gameList != updatedList)
                         {
-                            lastGameList.map { it.imageBitmap = TODO("url to bitmap") }
-                            lastGameList = updatedList
+                            gameList = updatedList
                             emit(updatedList)
                         }
                         else
                         {
                             Timber.i("Not emitting the recently fetch game list hence they are identical")
                         }
+
                         lastTimeGameListFetched = System.currentTimeMillis()
 
                     }
@@ -60,53 +128,52 @@ class GameRepository constructor(private val apiService: GameAPIService) : BaseR
                 else
                 {
                     Timber.i(
-                            "GameData list is still fresh, not fetching again in ${refreshIntervalInMs / 1000} seconds. " +
-                                    "Elapsed time: ${System.currentTimeMillis() - lastTimeGameListFetched}")
+                        "GameData list is still fresh, not fetching again in ${refreshIntervalInMs / 1000} seconds. " +
+                                "Elapsed time: ${System.currentTimeMillis() - lastTimeGameListFetched}"
+                    )
                 }
+                delay(refreshIntervalInMs)
             }
-
-            delay(refreshIntervalInMs)
-
-
         }.flowOn(Dispatchers.IO)
     }
 
+    private suspend fun fetchGameListOverNetwork(): Deferred<List<GameData>?> =
+        withContext(Dispatchers.IO) {
 
-    override suspend fun fetchGameListFromNetwork(): Deferred<List<GameData>?> = withContext(Dispatchers.IO) {
-
-        return@withContext async {
-            var list: List<GameData>? = null
-            try
-            {
-                val response = apiService.getGameList().execute()
-
-                if (response.isSuccessful && response.body() != null)
+            return@withContext async {
+                var list: List<GameData>? = null
+                try
                 {
-                    Timber.i("Response is successful")
+                    val response = apiService.getGameList().execute()
 
-                    list = response.body()!!.list
+                    if (response.isSuccessful && response.body() != null)
+                    {
+                        Timber.i("Response is successful")
+                        list = response.body()!!.list
+                        list = list.sortedBy { it.name }
+                    }
+                    else
+                    {
+                        Timber.w("Failed to fetch data from the network database. Error body: ${response.errorBody()}, Response body: ${response.body()}")
+
+                    }
                 }
-                else
+                catch (e: Exception)
                 {
-                    Timber.w("Failed to fetch data from the network database. Error body: ${response.errorBody()}, Response body: ${response.body()}")
+                    Timber.w("Exception while trying to fetch data from the network database. Stacktrace: ${e.printStackTrace()}")
 
                 }
+                finally
+                {
+                    return@async list
+                }
+                list //IDE is not smart enough to realize we are already returning no matter what in finally block; therefore, this needs to stay here
             }
-            catch (e: Exception)
-            {
-                Timber.w("Exception while trying to fetch data from the network database. Stacktrace: ${e.printStackTrace()}")
 
-            }
-            finally
-            {
-                return@async list
-            }
-            list //IDE is not smart enough to realize we are already returning no matter what in finally block; therefore, this needs to stay here
         }
 
-    }
 
-    override suspend fun fetchGameDetailsOnceFromDatabase(gameId: Int, errorListener: ErrorListener?): Deferred<GameDetails?> =
+    suspend fun fetchGameDetailsOnceFromDatabase(gameId: Int): Deferred<GameDetails?> =
         withContext(Dispatchers.IO) {
 
             var gameDetails: GameDetails? = null
@@ -141,32 +208,107 @@ class GameRepository constructor(private val apiService: GameAPIService) : BaseR
 
         }
 
-    override suspend fun getCachedGameList(): Deferred<List<GameData>?>
+
+    private suspend fun getCachedGameList(): Deferred<List<GameData>?> =
+        withContext(Dispatchers.IO) {
+            return@withContext async {
+                return@async roomDatabase.gameDataDao().getAll()
+            }
+        }
+
+
+    private suspend fun cacheGameList(gameDataList: List<GameData>): Job =
+        withContext(Dispatchers.IO) {
+            return@withContext async {
+                roomDatabase.gameDataDao().insert(*gameDataList.toTypedArray())
+            }
+        }
+
+
+    private suspend fun gameDataUpdated(gameData: GameData): Job = withContext(Dispatchers.IO) {
+
+        return@withContext async {
+            roomDatabase.gameDataDao().update(gameData)
+        }
+    }
+
+
+    class GameRepositoryBuilder
     {
-        TODO("Not yet implemented")
+        private var apiService: GameAPIService? = null
+        private var roomDatabase: RoomAppDatabase? = null
+        private var config: RepositoryConfig? = null
+
+        private var refreshIntervalInMs: Long = 20000L
+        private var dataExpirationDurationInMs: Long = 1000 * 60 * 60L
+
+
+        fun setApiService(apiService: GameAPIService): GameRepositoryBuilder
+        {
+            this.apiService = apiService
+            return this
+        }
+
+
+        fun setRoomDatabase(roomDatabase: RoomAppDatabase): GameRepositoryBuilder
+        {
+            this.roomDatabase = roomDatabase
+            return this
+        }
+
+
+        fun setConfig(config: RepositoryConfig): GameRepositoryBuilder
+        {
+            this.config = config
+            return this
+        }
+
+        fun setRefreshIntervalInMs(value: Long): GameRepositoryBuilder
+        {
+            require(value > 0, { "Refresh interval has to be bigger than 0" })
+            this.refreshIntervalInMs = value
+            return this
+        }
+
+        fun setDataExpirationDurationInMs(value: Long): GameRepositoryBuilder
+        {
+            require(value > 0, { "Data expiration duration has to be bigger than 0" })
+            this.dataExpirationDurationInMs = value
+            return this
+        }
+
+        fun create(): GameRepository
+        {
+            requireNotNull(apiService, { "API Service was not set" })
+            requireNotNull(config, { "Config was not set" })
+
+            when (config)
+            {
+                RepositoryConfig.LOCAL_FIRST_CONTINUOUS_NETWORK_REFRESH ->
+                {
+                    requireNotNull(roomDatabase, { "This config requires a Room database" })
+
+                }
+                RepositoryConfig.LOCAL_UNTIL_STALE ->
+                {
+                    requireNotNull(roomDatabase, { "This config requires a Room database" })
+
+                }
+                RepositoryConfig.NETWORK_ONLY ->
+                {
+                }
+            }
+
+            return GameRepository(
+                apiService!!,
+                roomDatabase,
+                config!!,
+                refreshIntervalInMs,
+                dataExpirationDurationInMs
+            )
+        }
 
     }
 
 
-    override suspend fun cacheGameList(gameDataList: List<GameData>): Job
-    {
-        TODO("Not yet implemented")
-    }
-
-
-    override suspend fun addGameToFavorites(gameId: Int): Job
-    {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun removeGameFromFavorites(gameId: Int): Job
-    {
-        TODO("Not yet implemented")
-    }
-
-}
-
-enum class RequestResult
-{
-    SUCCESS, FAIL
 }

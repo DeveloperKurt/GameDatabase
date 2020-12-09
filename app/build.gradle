@@ -47,6 +47,7 @@ dependencies {
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'androidx.palette:palette-ktx:1.0.0'
     compileOnly "com.squareup.inject:assisted-inject-annotations-dagger2:0.6.0"
     kapt "androidx.room:room-compiler:$rootProject.roomVersion"
     kapt "com.github.bumptech.glide:compiler:4.11.0"
