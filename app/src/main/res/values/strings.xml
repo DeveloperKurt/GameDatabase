@@ -11,4 +11,5 @@
     <string name="rating">Rating: %1$.1f</string>
     <string name="date">Date: %1$1s</string>
     <string name="whoops_something_went_wrong">Whoops! Something went wrong</string>
+    <string name="your_favorite_games">Your Favorite Games</string>
 </resources>

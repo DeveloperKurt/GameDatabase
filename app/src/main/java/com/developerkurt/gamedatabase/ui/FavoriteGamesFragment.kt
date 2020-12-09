@@ -38,6 +38,7 @@ class FavoriteGamesFragment : Fragment(), GameListAdapter.GameClickListener
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
+        (requireActivity() as MainActivity).displayBottomNavBar()
 
         val gameListAdapter = GameListAdapter(this)
         binding.recyclerViewFavoriteGames.adapter = gameListAdapter

@@ -3,7 +3,7 @@
     <style name="Theme.GameDatabase" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Primary brand color. -->
         <item name="colorPrimary">#00A2FF</item>
-        <item name="colorPrimaryVariant">#03167A</item>
+        <item name="colorPrimaryVariant">#171717</item>
         <item name="colorOnPrimary">#000000</item>
         <!-- Secondary brand color. -->
         <item name="colorSecondary">#E0E0E0</item>

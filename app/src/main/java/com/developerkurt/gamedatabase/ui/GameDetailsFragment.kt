@@ -3,6 +3,7 @@ package com.developerkurt.gamedatabase.ui
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.text.method.ScrollingMovementMethod
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -43,9 +44,11 @@ class GameDetailsFragment : Fragment(), View.OnClickListener
     {
         super.onViewCreated(view, savedInstanceState)
         binding.imgBtnAddToFavs.setOnClickListener(this)
+        (requireActivity() as MainActivity).hideBottomNavBar()
+
 
         changeLayoutStateToLoading()
-
+        binding.tvDescription.setMovementMethod(ScrollingMovementMethod())
         viewModel.getIsFavoriteLive().observe(viewLifecycleOwner, {
             setUIFavoriteState(it)
         })
@@ -96,7 +99,6 @@ class GameDetailsFragment : Fragment(), View.OnClickListener
     }
 
 
-    //TODO motion layout ignores the visibility changes
     private fun changeLayoutStateToLoading()
     {
         binding.progressBar.visibility = View.VISIBLE
@@ -125,6 +127,7 @@ class GameDetailsFragment : Fragment(), View.OnClickListener
 
     }
 
+    //TODO Get a dark and a light tone of the image to create a gradient instead of a singular color
     /**
      * Decided to not to use since I didn't like the end result. Keeping a consistent theme seems to be
      * looking way better. But feel free to try it.

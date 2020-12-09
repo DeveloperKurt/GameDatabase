@@ -28,6 +28,7 @@
             android:id="@+id/iv_game_image"
             android:layout_width="match_parent"
             android:layout_height="250dp"
+            android:scaleType="centerCrop"
             app:layout_constraintBottom_toTopOf="@+id/details_layout"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
@@ -35,10 +36,12 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.0"
             app:load_image="@{game_details}"
+            app:visibilityMode="ignore"
             tools:src="@tools:sample/backgrounds/scenic" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/details_layout"
+            app:visibilityMode="ignore"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginStart="16dp"
@@ -67,10 +70,11 @@
 
             <TextView
                 android:id="@+id/tv_game_title"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
+                android:layout_marginEnd="24dp"
                 android:text="@{game_details.name}"
                 android:textAllCaps="true"
                 android:textSize="32sp"
@@ -78,13 +82,13 @@
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                tools:text="Game Title" />
+                tools:text="Red Dead Redemption 2" />
 
             <TextView
                 android:id="@+id/tv_release_date"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="16dp"
                 android:text="@{String.format(@string/release_date, game_details.releaseDate)}"
                 app:layout_constraintEnd_toEndOf="@+id/tv_game_title"
                 app:layout_constraintHorizontal_bias="0.0"
@@ -92,14 +96,16 @@
                 app:layout_constraintTop_toBottomOf="@+id/tv_game_title"
                 tools:text="@string/release_date" />
 
+
             <TextView
                 android:id="@+id/tv_description"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="24dp"
+                android:layout_height="0dp"
+                android:layout_marginStart="0dp"
                 android:layout_marginTop="16dp"
-                android:layout_marginEnd="24dp"
-                android:layout_marginBottom="16dp"
+                android:layout_marginEnd="0dp"
+                android:layout_marginBottom="8dp"
+                android:scrollbars="vertical"
                 android:paddingStart="20dp"
                 android:paddingEnd="20dp"
                 android:text="@{game_details.description}"
@@ -124,14 +130,14 @@
                 android:id="@+id/img_btn_add_to_favs"
                 android:layout_width="28dp"
                 android:layout_height="28dp"
+                android:layout_marginTop="24dp"
                 android:layout_marginEnd="24dp"
                 android:adjustViewBounds="true"
                 android:background="?android:selectableItemBackground"
                 android:scaleType="centerInside"
                 android:src="@drawable/ic_favorite"
-                app:layout_constraintBottom_toBottomOf="@+id/tv_game_title"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/tv_game_title" />
+                app:layout_constraintTop_toTopOf="parent" />
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>
@@ -142,6 +148,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:visibility="invisible"
+            app:visibilityMode="ignore"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -153,6 +160,7 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:visibility="gone"
+            app:visibilityMode="ignore"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

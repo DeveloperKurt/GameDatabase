@@ -32,4 +32,14 @@ class MainActivity : AppCompatActivity()
         val navController = Navigation.findNavController(this, R.id.fragment_container)
         NavigationUI.setupWithNavController(binding.bottomNavView, navController)
     }
+
+    fun displayBottomNavBar()
+    {
+        binding.bottomNavView.visibility = View.VISIBLE
+    }
+
+    fun hideBottomNavBar()
+    {
+        binding.bottomNavView.visibility = View.GONE
+    }
 }

@@ -16,7 +16,6 @@ import timber.log.Timber
 class SplashFragment : Fragment()
 {
 
-    //TODO INJECT
     private val viewModel: SplashViewModel by viewModels()
 
     // This property is only valid between onCreateView and onDestroyView.

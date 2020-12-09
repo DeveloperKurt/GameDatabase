@@ -5,6 +5,7 @@ import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
 import com.developerkurt.gamedatabase.data.GameRepository
 import com.developerkurt.gamedatabase.data.model.GameDetails
+import com.developerkurt.gamedatabase.util.stripHtml
 import kotlinx.coroutines.launch
 
 class GameDetailsViewModel @ViewModelInject internal constructor(
@@ -23,7 +24,15 @@ class GameDetailsViewModel @ViewModelInject internal constructor(
     {
 
         viewModelScope.launch {
-            gameDetailsLiveData.postValue(gameRepository.fetchGameDetailsOnceFromDatabase(gameId).await())
+
+            gameDetailsLiveData.postValue(
+                    gameRepository.fetchGameDetailsOnceFromDatabase(gameId).await()
+                        .also {
+                            if (it != null)
+                            {
+                                it.description = it.description.stripHtml()
+                            }
+                        })
         }
         return gameDetailsLiveData
 

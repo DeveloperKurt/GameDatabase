@@ -19,7 +19,6 @@ import kotlinx.android.synthetic.main.error_layout.view.*
 import kotlinx.android.synthetic.main.game_list_fragment.*
 import kotlinx.coroutines.launch
 
-//TODO the fragment container in the layout doesn't respect its bottom container; thus, last recyclerview item is barely visible
 @AndroidEntryPoint
 class GameListFragment : Fragment(), GameListAdapter.GameClickListener
 {
@@ -42,6 +41,9 @@ class GameListFragment : Fragment(), GameListAdapter.GameClickListener
     {
         super.onViewCreated(view, savedInstanceState)
 
+        (requireActivity() as MainActivity).displayBottomNavBar()
+
+
         val gameListAdapter = GameListAdapter(this)
         val imagePagerAdapter = ImagePagerAdapter(requireContext())
 
@@ -61,9 +63,6 @@ class GameListFragment : Fragment(), GameListAdapter.GameClickListener
 
     }
 
-
-    //TODO Check the lifecycle's effect on LiveData, atm it doesn't emit values when navigated back from a navigationbar fragment
-    //TODO (UPDATE): Probable cause is the bottom nav bar since the same thing is happening to the favorites fragment.
 
     private fun subscribeUi(gameListAdapter: GameListAdapter, imagePagerAdapter: ImagePagerAdapter)
     {

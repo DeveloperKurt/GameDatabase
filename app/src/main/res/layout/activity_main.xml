@@ -26,7 +26,6 @@
         android:layout_height="wrap_content"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
-
         app:menu="@menu/bottom_nav_menu" />
 
 

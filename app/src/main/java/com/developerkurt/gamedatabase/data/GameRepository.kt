@@ -31,6 +31,8 @@ class GameRepository private constructor(
 
     private val roomDatabase = _roomDatabase!!
 
+    //TODO don't use [gameList] as a data source, use room instead. It causes a bug in favorites fragment. Also when updating the cache,
+    //take the data's favorite state in account
 
     /**
      * Fetches the data depending on the provided config
