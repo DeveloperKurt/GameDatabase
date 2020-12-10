@@ -9,120 +9,129 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import timber.log.Timber
 
-//TODO [Before Release] Change refreshIntervalInMs to 1 min
-//TODO coroutinescope is not respected
+
 /**
  * @param config Config for the retrieval method of the GameList
  */
 class GameRepository private constructor(
-    private val apiService: GameAPIService,
-    _roomDatabase: RoomAppDatabase?,
-    private val config: RepositoryConfig,
-    private var refreshIntervalInMs: Long,
-    private var dataExpirationDurationInMs: Long
-) : BaseRepository()
+        private val apiService: GameAPIService,
+        private val roomDatabase: RoomAppDatabase,
+        private val config: RepositoryConfig,
+        private var refreshIntervalInMs: Long,
+        private var dataExpirationDurationInMs: Long
+                                        ) : BaseRepository()
 {
 
     private var lastTimeGameListFetched = -1L
 
-    @Volatile
-    private var gameList: List<GameData>? = null
 
+    @Volatile private var hasCachedGameData = false
+    @Volatile var isGettingContinuousUpdates = false
 
-    private val roomDatabase = _roomDatabase!!
+    private val gameDataMutableStateFlow = MutableStateFlow(DataState.UNKNOWN)
+    fun gameDataStateFlow(): Flow<DataState> = gameDataMutableStateFlow
 
-    //TODO don't use [gameList] as a data source, use room instead. It causes a bug in favorites fragment. Also when updating the cache,
-    //take the data's favorite state in account
+    private val gameDetailsMutableStateFlow = MutableStateFlow(DataState.UNKNOWN)
+    fun gameDetailsStateFlow(): Flow<DataState> = gameDetailsMutableStateFlow
+
+    fun getGameDataFlow(): Flow<List<GameData>> = roomDatabase.gameDataDao().subscribeToAll()
+
 
     /**
-     * Fetches the data depending on the provided config
+     * Fetches the data over the network depending on the provided config
+     * @return Returns a boolean flow indicating whether any error has occurred while fetching the data
      */
-    suspend fun getTheLatestGameList(errorListener: ErrorListener?): Flow<List<GameData>>
+    suspend fun startGettingGameDataUpdates()
     {
 
-        return flow {
-            if (gameList != null)
+        when (config)
+        {
+            RepositoryConfig.LOCAL_FIRST_CONTINUOUS_NETWORK_REFRESH ->
             {
-                Timber.i("Found a local list of games, emitting right away.")
-                emit(gameList!!)
+
+                fetchAndCacheContinuously()
             }
-            else
+
+            RepositoryConfig.LOCAL_UNTIL_STALE ->
             {
-
-                when (config)
-                {
-                    RepositoryConfig.LOCAL_FIRST_CONTINUOUS_NETWORK_REFRESH ->
-                    {
-                        val cachedList = getCachedGameList().await()
-                        if (cachedList != null)
-                        {
-                            Timber.i("Found a cached list")
-                            gameList = cachedList.sortedBy { it.name }
-                            emit(gameList!!)
-                        }
-
-                        fetchContinuously(errorListener).collect {
-                            cacheGameList(it)
-                            emit(it)
-                        }
-
-                    }
-                    RepositoryConfig.LOCAL_UNTIL_STALE ->
-                    {
-                        TODO("This config is not implemented yet")
-                    }
-
-
-                }
+                TODO("This config is not yet implemented")
             }
         }
     }
 
-
-    @SuppressLint("BinaryOperationInTimber")
-    private fun fetchContinuously(errorListener: ErrorListener?): Flow<List<GameData>>
+    /**
+     * Tries to get the [GameData] list to the local repository.
+     * @return true if succeeds, false if fails.
+     */
+    suspend fun ifAblePrepareGameDataList(): Boolean
     {
 
-        return flow {
+        if (roomDatabase.gameDataDao().getAnyGameData() != null)
+        {
+            Timber.i("Found cached local data")
+            hasCachedGameData = true
+            return true
+        }
+
+
+        //If reached here there isn't any local data, get them over the network
+        val list = fetchGameListOverNetwork().await()
+        if (list == null)
+        {
+            return false
+        }
+        else
+        {
+            cacheGameList(list)
+            return true
+        }
+
+    }
+
+    @SuppressLint("BinaryOperationInTimber")
+    private suspend fun fetchAndCacheContinuously()
+    {
+
+        //We wouldn't want multiple threads to race to fetchData to the same source indefinitely right?
+        if (!isGettingContinuousUpdates)
+        {
             while (currentCoroutineContext().isActive)
             {
-                //Fetch new data only when the elapsed time is bigger than the [refreshIntervalInMs]
+                isGettingContinuousUpdates = true
+
+                //Fetch new data only when the elapsed time is more than the [refreshIntervalInMs]
                 if (System.currentTimeMillis() - lastTimeGameListFetched > refreshIntervalInMs || lastTimeGameListFetched == -1L)
                 {
                     val updatedList = fetchGameListOverNetwork().await()
 
                     if (updatedList != null)
                     {
-
-                        if (gameList == null || gameList != updatedList)
-                        {
-                            gameList = updatedList
-                            emit(updatedList)
-                        }
-                        else
-                        {
-                            Timber.i("Not emitting the recently fetch game list hence they are identical")
-                        }
-
+                        cacheGameList(updatedList)
+                        gameDataMutableStateFlow.emit(DataState.SUCCESS)
                         lastTimeGameListFetched = System.currentTimeMillis()
-
                     }
                     else
                     {
                         Timber.w("Fetched game list was null")
-                        errorListener?.onError()
+
+                        gameDataMutableStateFlow.emit(DataState.FAILED_TO_UPDATE)
+
+                        if (!hasCachedGameData) gameDataMutableStateFlow.emit(DataState.FAILED)
+
                     }
                 }
                 else
                 {
                     Timber.i(
-                        "GameData list is still fresh, not fetching again in ${refreshIntervalInMs / 1000} seconds. " +
-                                "Elapsed time: ${System.currentTimeMillis() - lastTimeGameListFetched}"
-                    )
+                            "GameData list is still fresh, not fetching again in ${refreshIntervalInMs / 1000} seconds. " +
+                                    "Elapsed time: ${System.currentTimeMillis() - lastTimeGameListFetched}")
                 }
                 delay(refreshIntervalInMs)
             }
-        }.flowOn(Dispatchers.IO)
+            isGettingContinuousUpdates = false
+
+        }
+
     }
 
     private suspend fun fetchGameListOverNetwork(): Deferred<List<GameData>?> =
@@ -175,16 +184,23 @@ class GameRepository private constructor(
                         Timber.i("Response is successful")
 
                         gameDetails = response.body()
+                        gameDetailsMutableStateFlow.emit(DataState.SUCCESS)
                     }
                     else
                     {
                         Timber.w("Failed to fetch data from the network database. Error body: ${response.errorBody()}, Response body: ${response.body()}")
+                        gameDetailsMutableStateFlow.emit(DataState.FAILED_TO_UPDATE)
+                        gameDetailsMutableStateFlow.emit(DataState.FAILED)
+
 
                     }
                 }
                 catch (e: Exception)
                 {
                     Timber.w("Exception while trying to fetch data from the network database. Stacktrace: ${e.printStackTrace()}")
+                    gameDetailsMutableStateFlow.emit(DataState.FAILED_TO_UPDATE)
+                    gameDetailsMutableStateFlow.emit(DataState.FAILED)
+
 
                 }
                 finally
@@ -204,11 +220,61 @@ class GameRepository private constructor(
             }
         }
 
-    //TODO delete entire old cached data
+
+    /**
+     * Prior to caching, checks if there is already some cached data. If so, it updates the ones that are different
+     * and adds or deletes the records if they were found/not found in the fetched [gameDataList]
+     */
     private suspend fun cacheGameList(gameDataList: List<GameData>): Job =
         withContext(Dispatchers.IO) {
             return@withContext async {
-                roomDatabase.gameDataDao().insert(*gameDataList.toTypedArray())
+                val cachedData = roomDatabase.gameDataDao().getAll()
+
+                if (cachedData != null)
+                {
+                    val sumOfLists = cachedData + gameDataList
+
+                    val groupedMapSumOfLists: MutableMap<Int, List<GameData>> = (sumOfLists.groupBy { it.id }).toMutableMap()
+
+                    //Handle the uncommon elements
+                    groupedMapSumOfLists.filter { it.value.size == 1 } //If the id groups' size is 1, it means it's either removed from or added to the server
+                        .flatMap { it.value }
+                        .forEach {
+                            //If this data doesn't exist in the fetched network data, delete it
+                            if (cachedData.contains(it))
+                            {
+                                roomDatabase.gameDataDao().delete(it)
+                            }
+                            //If this data doesn't exist in the local data, add it
+                            else if (gameDataList.contains(it))
+                            {
+                                roomDatabase.gameDataDao().insert(it)
+                            }
+
+                            //Remove the handled data to optimize the next loop
+                            groupedMapSumOfLists.remove(it.id)
+
+                        }
+
+                    //Handle the elements with an updated data
+                    groupedMapSumOfLists.keys.forEach {
+                        val gameDatasWithSameIds = groupedMapSumOfLists.get(it)
+
+                        require(gameDatasWithSameIds!!.size == 2,
+                                { "There should never be duplicates of the data in either source or unhandled addition/deletion at this stage" })
+
+                        //Found an updated [GameData]. Take its is favorite state and add it to the new data.
+                        /*NOTE: since isInFavorites field is not in the primary constructor of the GameData,
+                        it won't be taken into account when comparing them*/
+                        if (gameDatasWithSameIds[0] != gameDatasWithSameIds[1])
+                        {
+                            val isInFavorites = gameDatasWithSameIds[0].isInFavorites
+                            gameDatasWithSameIds[1].isInFavorites = isInFavorites
+                            roomDatabase.gameDataDao().update(gameDatasWithSameIds[1])
+                        }
+                    }
+
+                }
             }
         }
 
@@ -235,7 +301,7 @@ class GameRepository private constructor(
         private var roomDatabase: RoomAppDatabase? = null
         private var config: RepositoryConfig? = null
 
-        private var refreshIntervalInMs: Long = 20000L
+        private var refreshIntervalInMs: Long = 25000L
         private var dataExpirationDurationInMs: Long = 1000 * 60 * 60L
 
 
@@ -273,36 +339,25 @@ class GameRepository private constructor(
             return this
         }
 
+        /**
+         * Certain RepositoryConfigs might not require some of the fields;
+         * therefore, the dependencies are checked individually for every config
+         */
         fun create(): GameRepository
         {
             requireNotNull(apiService, { "API Service was not set" })
             requireNotNull(config, { "Config was not set" })
+            requireNotNull(roomDatabase, { "This config requires a Room database" })
 
-            when (config)
-            {
-                RepositoryConfig.LOCAL_FIRST_CONTINUOUS_NETWORK_REFRESH ->
-                {
-                    requireNotNull(roomDatabase, { "This config requires a Room database" })
-
-                }
-                RepositoryConfig.LOCAL_UNTIL_STALE ->
-                {
-                    requireNotNull(roomDatabase, { "This config requires a Room database" })
-
-                }
-
-            }
 
             return GameRepository(
-                apiService!!,
-                roomDatabase,
-                config!!,
-                refreshIntervalInMs,
-                dataExpirationDurationInMs
-            )
+                    apiService!!,
+                    roomDatabase!!,
+                    config!!,
+                    refreshIntervalInMs,
+                    dataExpirationDurationInMs)
         }
 
     }
-
 
 }

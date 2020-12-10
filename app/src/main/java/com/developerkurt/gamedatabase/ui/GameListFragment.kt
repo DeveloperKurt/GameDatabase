@@ -4,9 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import com.developerkurt.gamedatabase.adapters.GameListAdapter
 import com.developerkurt.gamedatabase.adapters.ImagePagerAdapter
@@ -15,12 +13,10 @@ import com.developerkurt.gamedatabase.databinding.GameListFragmentBinding
 import com.developerkurt.gamedatabase.viewmodels.GameListViewModel
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.error_layout.view.*
 import kotlinx.android.synthetic.main.game_list_fragment.*
-import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class GameListFragment : Fragment(), GameListAdapter.GameClickListener
+class GameListFragment : BaseDataFragment(), GameListAdapter.GameClickListener
 {
     private lateinit var binding: GameListFragmentBinding
     private val viewModel: GameListViewModel by viewModels()
@@ -42,7 +38,6 @@ class GameListFragment : Fragment(), GameListAdapter.GameClickListener
         super.onViewCreated(view, savedInstanceState)
 
         (requireActivity() as MainActivity).displayBottomNavBar()
-
 
         val gameListAdapter = GameListAdapter(this)
         val imagePagerAdapter = ImagePagerAdapter(requireContext())
@@ -71,39 +66,43 @@ class GameListFragment : Fragment(), GameListAdapter.GameClickListener
             imagePagerAdapter.update(it.take(3).map { it.imageUrl })
         })
 
-        viewModel.getErrorLiveData().observe(viewLifecycleOwner, {
-            if (it)
-            {
-                displayErrorLayout()
-            }
-            else
-            {
-                displayDefaultLayout()
-            }
+        viewModel.dataStateLiveData.observe(viewLifecycleOwner, {
+            handleDataStateChange(it)
         })
 
-        lifecycleScope.launch {
-            viewModel.getLatestGameList()
-        }
+
+        viewModel.getLatestGameList()
+
 
     }
 
-    private fun displayDefaultLayout()
+    override fun changeLayoutStateToLoading()
+    {
+        binding.progressBar.visibility = View.VISIBLE
+    }
+
+    override fun changeLayoutStateToReady()
     {
         binding.viewPagerGameImages.visibility = View.VISIBLE
         binding.recyclerViewGameData.visibility = View.VISIBLE
         binding.tlViewPagerScroll.visibility = View.VISIBLE
+        binding.progressBar.visibility = View.GONE
         binding.incErrorLayout.errorLayout.visibility = View.GONE
     }
 
-    private fun displayErrorLayout(errorMessage: String? = null)
+    override fun changeLayoutStateToError()
     {
         binding.viewPagerGameImages.visibility = View.INVISIBLE
         binding.recyclerViewGameData.visibility = View.INVISIBLE
         binding.tlViewPagerScroll.visibility = View.INVISIBLE
         binding.incErrorLayout.errorLayout.visibility = View.VISIBLE
-        errorMessage?.let { binding.incErrorLayout.errorLayout.tv_error_msg.text = it }
+        binding.progressBar.visibility = View.GONE
 
+    }
+
+    override fun changeLayoutFailedUpdate()
+    {
+        binding.progressBar.visibility = View.GONE
     }
 
 

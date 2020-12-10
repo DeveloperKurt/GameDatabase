@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
@@ -13,11 +12,10 @@ import com.developerkurt.gamedatabase.data.model.GameData
 import com.developerkurt.gamedatabase.databinding.FavoriteGamesFragmentBinding
 import com.developerkurt.gamedatabase.viewmodels.FavoriteGamesViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.error_layout.view.*
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class FavoriteGamesFragment : Fragment(), GameListAdapter.GameClickListener
+class FavoriteGamesFragment : BaseDataFragment(), GameListAdapter.GameClickListener
 {
     private val viewModel: FavoriteGamesViewModel by viewModels()
 
@@ -52,10 +50,8 @@ class FavoriteGamesFragment : Fragment(), GameListAdapter.GameClickListener
             gameListAdapter.updateList(it)
         })
 
-        viewModel.getErrorLiveData().observe(viewLifecycleOwner, {
-            if (it) displayErrorLayout()
-            else displayDefaultLayout()
-
+        viewModel.dataStateLiveData.observe(viewLifecycleOwner, {
+            handleDataStateChange(it)
         })
 
         lifecycleScope.launch {
@@ -63,19 +59,29 @@ class FavoriteGamesFragment : Fragment(), GameListAdapter.GameClickListener
         }
     }
 
-
-    private fun displayDefaultLayout()
+    override fun changeLayoutStateToLoading()
     {
+        binding.progressBar.visibility = View.VISIBLE
+    }
+
+    override fun changeLayoutStateToReady()
+    {
+        binding.progressBar.visibility = View.GONE
         binding.recyclerViewFavoriteGames.visibility = View.VISIBLE
         binding.incErrorLayout.errorLayout.visibility = View.GONE
     }
 
-    private fun displayErrorLayout(errorMessage: String? = null)
+    override fun changeLayoutStateToError()
     {
+        binding.progressBar.visibility = View.GONE
         binding.recyclerViewFavoriteGames.visibility = View.INVISIBLE
         binding.incErrorLayout.errorLayout.visibility = View.VISIBLE
-        errorMessage?.let { binding.incErrorLayout.errorLayout.tv_error_msg.text = it }
 
+    }
+
+    override fun changeLayoutFailedUpdate()
+    {
+        binding.progressBar.visibility = View.GONE
     }
 
     override fun onDestroyView()

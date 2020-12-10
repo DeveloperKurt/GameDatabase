@@ -8,7 +8,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.palette.graphics.Palette
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -22,7 +21,7 @@ import dagger.hilt.android.AndroidEntryPoint
 
 
 @AndroidEntryPoint
-class GameDetailsFragment : Fragment(), View.OnClickListener
+class GameDetailsFragment : BaseDataFragment(), View.OnClickListener
 {
 
     private val viewModel: GameDetailsViewModel by viewModels()
@@ -37,6 +36,7 @@ class GameDetailsFragment : Fragment(), View.OnClickListener
     {
         _binding = GameDetailsFragmentMotionSceneStartBinding.inflate(inflater, container, false)
         val view = binding.root
+        (requireActivity() as MainActivity).hideBottomNavBar()
         return view
     }
 
@@ -44,12 +44,14 @@ class GameDetailsFragment : Fragment(), View.OnClickListener
     {
         super.onViewCreated(view, savedInstanceState)
         binding.imgBtnAddToFavs.setOnClickListener(this)
-        (requireActivity() as MainActivity).hideBottomNavBar()
 
-
-        changeLayoutStateToLoading()
         binding.tvDescription.setMovementMethod(ScrollingMovementMethod())
-        viewModel.getIsFavoriteLive().observe(viewLifecycleOwner, {
+
+        viewModel.getDataStateLiveData().observe(viewLifecycleOwner, {
+            handleDataStateChange(it)
+        })
+
+        viewModel.getIsFavoriteLiveData().observe(viewLifecycleOwner, {
             setUIFavoriteState(it)
         })
 
@@ -57,14 +59,12 @@ class GameDetailsFragment : Fragment(), View.OnClickListener
             if (it != null)
             {
                 binding.gameDetails = it
-                changeLayoutStateToReady(it.imageUrl)
+                viewModel.imageUrl = it.imageUrl
+            }
 
-            }
-            else
-            {
-                changeLayoutStateToError()
-            }
         })
+
+
     }
 
 
@@ -99,7 +99,7 @@ class GameDetailsFragment : Fragment(), View.OnClickListener
     }
 
 
-    private fun changeLayoutStateToLoading()
+    override fun changeLayoutStateToLoading()
     {
         binding.progressBar.visibility = View.VISIBLE
         binding.detailsLayout.visibility = View.INVISIBLE
@@ -108,26 +108,32 @@ class GameDetailsFragment : Fragment(), View.OnClickListener
 
     }
 
-    private fun changeLayoutStateToReady(imageURL: String)
+    override fun changeLayoutStateToReady()
     {
         binding.progressBar.visibility = View.GONE
         binding.detailsLayout.visibility = View.VISIBLE
         binding.ivGameImage.visibility = View.VISIBLE
         binding.incErrorLayout.errorLayout.visibility = View.GONE
+        binding.mainLayout.isInteractionEnabled = true
 
-        // changeBackgroundToDominantImageColor(imageURL)
+        // viewModel.imageUrl?.let{ changeBackgroundToDominantImageColor(it)}
     }
 
-    private fun changeLayoutStateToError()
+    override fun changeLayoutStateToError()
     {
         binding.progressBar.visibility = View.GONE
         binding.detailsLayout.visibility = View.INVISIBLE
         binding.ivGameImage.visibility = View.INVISIBLE
         binding.incErrorLayout.errorLayout.visibility = View.VISIBLE
+        binding.mainLayout.isInteractionEnabled = false
 
     }
 
-    //TODO Get a dark and a light tone of the image to create a gradient instead of a singular color
+    override fun changeLayoutFailedUpdate()
+    {
+        changeLayoutStateToError()
+    }
+    //TODO [Improvement] Get a dark and a light tone of the image to create a gradient instead of a singular color
     /**
      * Decided to not to use since I didn't like the end result. Keeping a consistent theme seems to be
      * looking way better. But feel free to try it.

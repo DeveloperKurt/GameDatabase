@@ -4,28 +4,27 @@ import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.developerkurt.gamedatabase.data.GameRepository
+import kotlinx.coroutines.launch
+import timber.log.Timber
+import javax.inject.Inject
 
-class SplashViewModel @ViewModelInject internal constructor() : ViewModel()
+class SplashViewModel @ViewModelInject @Inject internal constructor(
+        private val gameRepository: GameRepository) : ViewModel()
 {
 
-    private var isLoadedLiveData = MutableLiveData(true)
+    private var isLoadedLiveData = MutableLiveData(false)
 
     fun getIsLoadedLiveData(): LiveData<Boolean> = isLoadedLiveData
 
-    fun load()
+    fun prepareData()
     {
-        //TODO change this to the actual implementation
-/*        val timer = Timer()
-        timer.schedule(object : TimerTask()
-        {
-            override fun run()
-            {
-          //      Timber.i("Display-Data is loaded")
+        viewModelScope.launch {
+            val didPrepareData = gameRepository.ifAblePrepareGameDataList()
+            Timber.i("Prepared the data: $didPrepareData")
 
-                isLoadedLiveData.postValue(true)
-
-            }
-
-        }, 2000)*/
+            isLoadedLiveData.value = true
+        }
     }
 }

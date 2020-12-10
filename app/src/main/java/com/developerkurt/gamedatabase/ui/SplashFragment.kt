@@ -31,10 +31,18 @@ class SplashFragment : Fragment()
         _binding = SplashFragmentBinding.inflate(inflater, container, false)
         val view = binding.root
 
+        return view
+    }
+
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?)
+    {
+        super.onViewCreated(view, savedInstanceState)
+
         viewModel.getIsLoadedLiveData().observe(viewLifecycleOwner, { isLoaded ->
             if (!isLoaded)
             {
-                viewModel.load()
+                viewModel.prepareData()
             }
             else
             {
@@ -42,11 +50,7 @@ class SplashFragment : Fragment()
                 navigateToGameListFragment()
             }
         })
-
-        return view
     }
-
-
     private fun navigateToGameListFragment()
     {
         val action = SplashFragmentDirections.actionSplashFragmentToGameListFragment()

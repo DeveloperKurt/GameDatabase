@@ -5,6 +5,7 @@
         app:applyMotionScene="false"
         app:visibilityMode="ignore" />-->
     <Transition
+
         app:constraintSetEnd="@layout/game_details_fragment_motion_scene_end"
         app:constraintSetStart="@layout/game_details_fragment_motion_scene_start">
 

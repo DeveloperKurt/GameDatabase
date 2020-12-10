@@ -17,11 +17,13 @@ abstract class BaseRepository
          */
         LOCAL_UNTIL_STALE,
 
-
     }
 
-    interface ErrorListener
+    enum class DataState
     {
-        fun onError()
+        UNKNOWN,
+        FAILED,
+        SUCCESS,
+        FAILED_TO_UPDATE
     }
 }
