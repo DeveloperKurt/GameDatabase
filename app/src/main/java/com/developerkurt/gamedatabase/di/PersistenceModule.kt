@@ -21,9 +21,9 @@ class PersistenceModule
     fun provideRoomDatabase(@ApplicationContext applicationContext: Context): RoomAppDatabase
     {
         return Room.databaseBuilder(
-            applicationContext,
-            RoomAppDatabase::class.java,
-            databaseName)
+                applicationContext,
+                RoomAppDatabase::class.java,
+                databaseName)
             .build()
     }
 }

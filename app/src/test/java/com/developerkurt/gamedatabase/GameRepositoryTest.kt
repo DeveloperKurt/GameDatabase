@@ -2,6 +2,7 @@ package com.developerkurt.gamedatabase
 
 import org.junit.Test
 
+//TODO Write the tests and add more of them
 class GameRepositoryTest
 {
 
@@ -25,13 +26,13 @@ class GameRepositoryTest
 
 
     @Test
-    fun `Is getTheLatestGameList() invoking the error listener when both of the repositories fail`()
+    fun `Is getTheLatestGameList() invoking the right data states `()
     {
 
     }
 
     @Test
-    fun `Is fetchGameDetailsOnceFromDatabase() invoking the error listener when the request fail`()
+    fun `Is fetchGameDetailsOnceFromDatabase() invoking the right data states`()
     {
 
     }

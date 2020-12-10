@@ -1,5 +1,6 @@
 package com.developerkurt.gamedatabase
 
+//TODO Write the tests and add more of them
 class UITest
 {
     fun isFragmentGameListDisplayingErrorViewOnFail()

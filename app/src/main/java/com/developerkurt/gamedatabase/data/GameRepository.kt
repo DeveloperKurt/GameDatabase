@@ -9,7 +9,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import timber.log.Timber
 
-
+//TODO [Improvement] Add multiple configs and apply it for every model unless they opt-out
 /**
  * @param config Config for the retrieval method of the GameList
  */
@@ -26,7 +26,7 @@ class GameRepository private constructor(
 
 
     @Volatile private var hasCachedGameData = false
-    @Volatile var isGettingContinuousUpdates = false
+    @Volatile private var isGettingContinuousUpdates = false
 
     private val gameDataMutableStateFlow = MutableStateFlow(DataState.UNKNOWN)
     fun gameDataStateFlow(): Flow<DataState> = gameDataMutableStateFlow

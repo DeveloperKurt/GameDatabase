@@ -12,15 +12,16 @@ import javax.inject.Singleton
 
 @InstallIn(SingletonComponent::class)
 @Module
-class GameRepositoryModule {
+class GameRepositoryModule
+{
 
     @Singleton
     @Provides
     fun provideGameRepository(
-        apiService: GameAPIService,
-        roomAppDatabase: RoomAppDatabase): GameRepository
+            apiService: GameAPIService,
+            roomAppDatabase: RoomAppDatabase): GameRepository
     {
-       return GameRepository.GameRepositoryBuilder()
+        return GameRepository.GameRepositoryBuilder()
             .setApiService(apiService)
             .setRoomDatabase(roomAppDatabase)
             .setConfig(BaseRepository.RepositoryConfig.LOCAL_FIRST_CONTINUOUS_NETWORK_REFRESH)

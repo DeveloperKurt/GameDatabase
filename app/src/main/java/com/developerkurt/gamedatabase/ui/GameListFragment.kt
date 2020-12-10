@@ -1,6 +1,8 @@
 package com.developerkurt.gamedatabase.ui
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,13 +17,15 @@ import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.game_list_fragment.*
 
+
 @AndroidEntryPoint
 class GameListFragment : BaseDataFragment(), GameListAdapter.GameClickListener
 {
     private lateinit var binding: GameListFragmentBinding
     private val viewModel: GameListViewModel by viewModels()
 
-
+    private lateinit var gameListAdapter: GameListAdapter
+    private lateinit var imagePagerAdapter: ImagePagerAdapter
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?): View?
@@ -39,8 +43,10 @@ class GameListFragment : BaseDataFragment(), GameListAdapter.GameClickListener
 
         (requireActivity() as MainActivity).displayBottomNavBar()
 
-        val gameListAdapter = GameListAdapter(this)
-        val imagePagerAdapter = ImagePagerAdapter(requireContext())
+        initSearchBar()
+
+        gameListAdapter = GameListAdapter(this)
+        imagePagerAdapter = ImagePagerAdapter(requireContext())
 
         recycler_view_game_data.adapter = gameListAdapter
         initViewPager(imagePagerAdapter)
@@ -74,6 +80,48 @@ class GameListFragment : BaseDataFragment(), GameListAdapter.GameClickListener
         viewModel.getLatestGameList()
 
 
+    }
+
+    private fun initSearchBar()
+    {
+
+        binding.layoutSearchBar.etSearch.addTextChangedListener(object : TextWatcher
+        {
+            override fun afterTextChanged(s: Editable)
+            {
+                if (s.length >= 3)
+                {
+                    changeLayoutStateToSearchResults()
+                    gameListAdapter.filterByName(s.toString())
+                }
+                else if (s.length < 3)
+                {
+                    gameListAdapter.removeFilter()
+                    changeLayoutStateToReady()
+                }
+            }
+
+            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int)
+            {
+            }
+
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int)
+            {
+            }
+        })
+
+        binding.layoutSearchBar.imgBtnSearch.setOnClickListener {
+            hideKeyboard()
+            binding.layoutSearchBar.etSearch.clearFocus()
+        }
+
+
+    }
+
+    private fun changeLayoutStateToSearchResults()
+    {
+        binding.viewPagerGameImages.visibility = View.GONE
+        binding.tlViewPagerScroll.visibility = View.GONE
     }
 
     override fun changeLayoutStateToLoading()

@@ -59,11 +59,11 @@ class GameDetailsFragment : BaseDataFragment(), View.OnClickListener
             if (it != null)
             {
                 binding.gameDetails = it
-                viewModel.imageUrl = it.imageUrl
+
+                // changeBackgroundToDominantImageColor(it.imageUrl)
             }
 
         })
-
 
     }
 
@@ -116,7 +116,6 @@ class GameDetailsFragment : BaseDataFragment(), View.OnClickListener
         binding.incErrorLayout.errorLayout.visibility = View.GONE
         binding.mainLayout.isInteractionEnabled = true
 
-        // viewModel.imageUrl?.let{ changeBackgroundToDominantImageColor(it)}
     }
 
     override fun changeLayoutStateToError()
@@ -133,6 +132,7 @@ class GameDetailsFragment : BaseDataFragment(), View.OnClickListener
     {
         changeLayoutStateToError()
     }
+
     //TODO [Improvement] Get a dark and a light tone of the image to create a gradient instead of a singular color
     /**
      * Decided to not to use since I didn't like the end result. Keeping a consistent theme seems to be

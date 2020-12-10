@@ -11,14 +11,35 @@ import com.developerkurt.gamedatabase.databinding.GameListItemBinding
 class GameListAdapter(val listenerCallback: GameClickListener) : RecyclerView.Adapter<GameListAdapter.GameDataViewHolder>()
 {
     private var gameList: MutableList<GameData> = mutableListOf()
+    private val unfilteredGameList: MutableList<GameData> = mutableListOf()
 
     fun updateList(gameList: List<GameData>)
     {
         this.gameList.clear()
         this.gameList.addAll(gameList)
 
+        unfilteredGameList.clear()
+        unfilteredGameList.addAll(gameList)
+
         notifyDataSetChanged()
     }
+
+    fun filterByName(string: String)
+    {
+        gameList = unfilteredGameList.filter { it.name.startsWith(string, true) }.toMutableList()
+        notifyDataSetChanged()
+    }
+
+    fun removeFilter()
+    {
+        if (gameList != unfilteredGameList)
+        {
+            gameList = unfilteredGameList
+            notifyDataSetChanged()
+        }
+
+    }
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = GameDataViewHolder(
             DataBindingUtil.inflate(
@@ -30,6 +51,7 @@ class GameListAdapter(val listenerCallback: GameClickListener) : RecyclerView.Ad
     override fun onBindViewHolder(holder: GameDataViewHolder, position: Int)
     {
         holder.binding.gameData = gameList[position]
+
     }
 
     override fun getItemCount(): Int = gameList.size

@@ -16,7 +16,7 @@ class GameDatabaseGlideModule : AppGlideModule()
     {
         super.applyOptions(context, builder)
         builder.apply {
-                 RequestOptions()
+            RequestOptions()
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .signature(ObjectKey(System.currentTimeMillis().toShort()))
         }

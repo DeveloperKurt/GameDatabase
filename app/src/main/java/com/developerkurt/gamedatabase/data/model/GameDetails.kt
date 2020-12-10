@@ -7,5 +7,4 @@ data class GameDetails(
         @field:SerializedName("description") var description: String,
         @field:SerializedName("released") val releaseDate: String,
         override @field:SerializedName("background_image") val imageUrl: String,
-        @field:SerializedName("metacritic") val metacriticRate: Int
-                      ) : ImageURLModel()
+        @field:SerializedName("metacritic") val metacriticRate: Int) : ImageURLModel()

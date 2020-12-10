@@ -16,7 +16,7 @@ class GameDetailsViewModel @ViewModelInject internal constructor(
 {
 
     val gameId: Int = savedStateHandle.get<Int>("gameId")!!
-    var imageUrl: String? = null
+
 
     private val gameDetailsLiveData = MutableLiveData<GameDetails?>()
     private val isFavoriteLiveData = MutableLiveData(savedStateHandle.get<Boolean>("isInFavorites")!!)

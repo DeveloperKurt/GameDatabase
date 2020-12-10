@@ -8,6 +8,12 @@ import timber.log.Timber
 @HiltAndroidApp
 class MainApplication : Application()
 {
+    /**
+     * ## Set to true to force the dark mode. Might come in handy if your android version doesn't support the night mode.
+     */
+    private val forceDarkMode = false
+
+
     override fun onCreate()
     {
         super.onCreate()
@@ -17,9 +23,10 @@ class MainApplication : Application()
         {
             Timber.plant(Timber.DebugTree())
         }
-        //Enable the line below to force the dark mode
-        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-        //  AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+        if (forceDarkMode)
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+        else
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
 
     }
 }
