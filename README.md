@@ -14,8 +14,8 @@ A Kotlin app made using the best practices, most recent Jetpack libraries, and K
 
 ## Code Structure
 
-Game Database's repository supports different configurations but by default, it treats to network server's data as a rapidly-changed or modified data. 
-Therefore, it fetches the data at short intervals and caches them if it detects any changes. 
+Game Database's repository supports different configurations but by default, it treats network server's data as a rapidly-changing live data. 
+Therefore, it fetches the data at short intervals and caches them if it detects any differences. 
 It respects the single source of truth architecture and SOLID principles. 
 The data is always retrieved through the Room database where it is exposed as a Flow in the repository layer. 
 ViewModels collect those Flows and transforms them into LiveDatas. And from there on, the fragments display the data through data-binding.
