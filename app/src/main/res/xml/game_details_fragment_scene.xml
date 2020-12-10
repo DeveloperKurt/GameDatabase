@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MotionScene xmlns:app="http://schemas.android.com/apk/res-auto">
+
+  <!--  <PropertySet
+        app:applyMotionScene="false"
+        app:visibilityMode="ignore" />-->
+    <Transition
+
+        app:constraintSetEnd="@layout/game_details_fragment_motion_scene_end"
+        app:constraintSetStart="@layout/game_details_fragment_motion_scene_start">
+
+        <OnSwipe
+            app:dragDirection="dragUp"
+            app:touchAnchorSide="top" />
+
+    </Transition>
+
+</MotionScene>

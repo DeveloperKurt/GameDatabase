@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/bottom_nav_menu">
+
+    <item
+        android:id="@+id/gameListFragment"
+        android:icon="@drawable/ic_home"
+        android:menuCategory="secondary"
+        android:title="@string/home" />
+    <item
+        android:id="@+id/favoriteGamesFragment"
+        android:icon="@drawable/ic_favorite"
+        android:menuCategory="secondary"
+        android:title="@string/favorites" />
+
+</menu>

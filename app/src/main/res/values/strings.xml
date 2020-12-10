@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">Game Database</string>
+    <string name="game_database">Game Database</string>
+    <string name="home">Home</string>
+    <string name="favorites">Favorites</string>
+
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="release_date">Release Date: %1$s</string>
+    <string name="metacritic_rate">Metacritic Rate: %1$d</string>
+    <string name="search">Search</string>
+    <string name="rating">Rating: %1$.1f</string>
+    <string name="date">Date: %1$1s</string>
+    <string name="whoops_something_went_wrong">Whoops! Something went wrong</string>
+    <string name="your_favorite_games">Your Favorite Games</string>
+    <string name="data_update_fail">Failed to update the data</string>
+</resources>
