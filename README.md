@@ -1,11 +1,14 @@
 # Game Database
+<img align="left" width="128" height="128"  src="https://i.imgur.com/qkYd9tc.png" alt="">  
 
-A Kotlin app made using the best practices, most recent Jetpack libraries, and Kotlin coroutines.
+<br>
+A Kotlin app made using the best practices, most recent Jetpack libraries, and Kotlin coroutines. 
 
-It uses the [RAWG Video Games Database](https://choosealicense.com/licenses/mit/) to retrieve and display a video game list and game details when clicked. 
 
-![Dark Theme](https://i.ibb.co/0ZVzY3n/dark-theme.png)
-![Light Theme](https://i.ibb.co/kSRMqNG/light-theme.png)
+<br><br><br><br><br><br>
+
+![Dark Theme](https://i.imgur.com/8JG1fDt.png)
+![Light Theme](https://i.imgur.com/2Bul95F.png)
 
 
 
