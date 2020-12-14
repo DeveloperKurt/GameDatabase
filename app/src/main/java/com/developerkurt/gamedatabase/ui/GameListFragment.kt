@@ -91,8 +91,8 @@ class GameListFragment : BaseDataFragment(), GameListAdapter.GameClickListener
             {
                 if (s.length >= 3)
                 {
-                    changeLayoutStateToSearchResults()
-                    gameListAdapter.filterByName(s.toString())
+                    changeLayoutStateToSearchResults(gameListAdapter.filterByName(s.toString()))
+
                 }
                 else if (s.length < 3)
                 {
@@ -118,15 +118,23 @@ class GameListFragment : BaseDataFragment(), GameListAdapter.GameClickListener
 
     }
 
-    private fun changeLayoutStateToSearchResults()
+    private fun changeLayoutStateToSearchResults(didFindResults: Boolean)
     {
         binding.viewPagerGameImages.visibility = View.GONE
         binding.tlViewPagerScroll.visibility = View.GONE
+
+        if (!didFindResults)
+            binding.tvNoResults.visibility = View.VISIBLE
+        else
+            binding.tvNoResults.visibility = View.INVISIBLE
+
     }
 
     override fun changeLayoutStateToLoading()
     {
         binding.progressBar.visibility = View.VISIBLE
+        binding.tvNoResults.visibility = View.GONE
+
     }
 
     override fun changeLayoutStateToReady()
@@ -134,6 +142,7 @@ class GameListFragment : BaseDataFragment(), GameListAdapter.GameClickListener
         binding.viewPagerGameImages.visibility = View.VISIBLE
         binding.recyclerViewGameData.visibility = View.VISIBLE
         binding.tlViewPagerScroll.visibility = View.VISIBLE
+        binding.tvNoResults.visibility = View.INVISIBLE
         binding.progressBar.visibility = View.GONE
         binding.incErrorLayout.errorLayout.visibility = View.GONE
     }
@@ -145,6 +154,7 @@ class GameListFragment : BaseDataFragment(), GameListAdapter.GameClickListener
         binding.tlViewPagerScroll.visibility = View.INVISIBLE
         binding.incErrorLayout.errorLayout.visibility = View.VISIBLE
         binding.progressBar.visibility = View.GONE
+        binding.tvNoResults.visibility = View.GONE
 
     }
 

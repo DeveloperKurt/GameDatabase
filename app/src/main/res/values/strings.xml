@@ -13,4 +13,5 @@
     <string name="whoops_something_went_wrong">Whoops! Something went wrong</string>
     <string name="your_favorite_games">Your Favorite Games</string>
     <string name="data_update_fail">Failed to update the data</string>
+    <string name="no_results_found_for_the_searched_game">No results found for the searched game.</string>
 </resources>

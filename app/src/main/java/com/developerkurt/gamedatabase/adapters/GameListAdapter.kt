@@ -24,10 +24,15 @@ class GameListAdapter(val listenerCallback: GameClickListener) : RecyclerView.Ad
         notifyDataSetChanged()
     }
 
-    fun filterByName(string: String)
+    /**
+     * @return Returns true if the list is not empty after filtering
+     */
+    fun filterByName(string: String): Boolean
     {
         gameList = unfilteredGameList.filter { it.name.startsWith(string, true) }.toMutableList()
         notifyDataSetChanged()
+        return if (gameList.size > 0) true
+        else false
     }
 
     fun removeFilter()
