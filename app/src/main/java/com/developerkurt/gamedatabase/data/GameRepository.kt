@@ -5,6 +5,7 @@ import com.developerkurt.gamedatabase.data.api.GameAPIService
 import com.developerkurt.gamedatabase.data.model.GameData
 import com.developerkurt.gamedatabase.data.model.GameDetails
 import com.developerkurt.gamedatabase.data.persistence.RoomAppDatabase
+import com.developerkurt.gamedatabase.util.execute
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import timber.log.Timber
@@ -18,7 +19,8 @@ class GameRepository private constructor(
         private val roomDatabase: RoomAppDatabase,
         private val config: RepositoryConfig,
         private var refreshIntervalInMs: Long,
-        private var dataExpirationDurationInMs: Long
+        private var dataExpirationDurationInMs: Long,
+        private val shouldRetryWhenFailed: Boolean
                                         ) : BaseRepository()
 {
 
@@ -141,7 +143,7 @@ class GameRepository private constructor(
                 var list: List<GameData>? = null
                 try
                 {
-                    val response = apiService.getGameList().execute()
+                    val response = apiService.getGameList().execute(shouldRetryWhenFailed)
 
                     if (response.isSuccessful && response.body() != null)
                     {
@@ -175,9 +177,11 @@ class GameRepository private constructor(
 
             var gameDetails: GameDetails? = null
             return@withContext async {
+
+                val response: retrofit2.Response<GameDetails>
                 try
                 {
-                    val response = apiService.getGameDetails(gameId).execute()
+                    response = apiService.getGameDetails(gameId).execute(shouldRetryWhenFailed)
 
                     if (response.isSuccessful)
                     {
@@ -205,6 +209,7 @@ class GameRepository private constructor(
                 }
                 finally
                 {
+
                     return@async gameDetails
                 }
                 gameDetails
@@ -232,49 +237,58 @@ class GameRepository private constructor(
 
                 if (cachedData != null)
                 {
-                    val sumOfLists = cachedData + gameDataList
+                    if (cachedData.size > 0)
+                    {
+                        val sumOfLists = cachedData + gameDataList
 
-                    val groupedMapSumOfLists: MutableMap<Int, List<GameData>> = (sumOfLists.groupBy { it.id }).toMutableMap()
+                        val groupedMapSumOfLists: MutableMap<Int, List<GameData>> = (sumOfLists.groupBy { it.id }).toMutableMap()
 
-                    //Handle the uncommon elements
-                    groupedMapSumOfLists.filter { it.value.size == 1 } //If the id groups' size is 1, it means it's either removed from or added to the server
-                        .flatMap { it.value }
-                        .forEach {
-                            //If this data doesn't exist in the fetched network data, delete it
-                            if (cachedData.contains(it))
-                            {
-                                roomDatabase.gameDataDao().delete(it)
+                        //Handle the uncommon elements
+                        groupedMapSumOfLists.filter { it.value.size == 1 } //If the id groups' size is 1, it means it's either removed from or added to the server
+                            .flatMap { it.value }
+                            .forEach {
+                                //If this data doesn't exist in the fetched network data, delete it
+                                if (cachedData.contains(it))
+                                {
+                                    roomDatabase.gameDataDao().delete(it)
+                                }
+                                //If this data doesn't exist in the local data, add it
+                                else if (gameDataList.contains(it))
+                                {
+                                    roomDatabase.gameDataDao().insert(it)
+                                }
+
+                                //Remove the handled data to optimize the next loop
+                                groupedMapSumOfLists.remove(it.id)
+
                             }
-                            //If this data doesn't exist in the local data, add it
-                            else if (gameDataList.contains(it))
-                            {
-                                roomDatabase.gameDataDao().insert(it)
-                            }
 
-                            //Remove the handled data to optimize the next loop
-                            groupedMapSumOfLists.remove(it.id)
+                        //Handle the elements with an updated data
+                        groupedMapSumOfLists.keys.forEach {
+                            val gameDatasWithSameIds = groupedMapSumOfLists.get(it)
 
-                        }
+                            require(gameDatasWithSameIds!!.size == 2,
+                                    { "There should never be duplicates of the data in either source or an unhandled addition/deletion at this stage" })
 
-                    //Handle the elements with an updated data
-                    groupedMapSumOfLists.keys.forEach {
-                        val gameDatasWithSameIds = groupedMapSumOfLists.get(it)
-
-                        require(gameDatasWithSameIds!!.size == 2,
-                                { "There should never be duplicates of the data in either source or unhandled addition/deletion at this stage" })
-
-                        //Found an updated [GameData]. Take its is favorite state and add it to the new data.
-                        /*NOTE: since isInFavorites field is not in the primary constructor of the GameData,
+                            //Found an updated [GameData]. Take its is favorite state and add it to the new data.
+                            /*NOTE: since isInFavorites field is not in the primary constructor of the GameData,
                         it won't be taken into account when comparing them*/
-                        if (gameDatasWithSameIds[0] != gameDatasWithSameIds[1])
-                        {
-                            val isInFavorites = gameDatasWithSameIds[0].isInFavorites
-                            gameDatasWithSameIds[1].isInFavorites = isInFavorites
-                            roomDatabase.gameDataDao().update(gameDatasWithSameIds[1])
+                            if (gameDatasWithSameIds[0] != gameDatasWithSameIds[1])
+                            {
+                                val isInFavorites = gameDatasWithSameIds[0].isInFavorites
+                                gameDatasWithSameIds[1].isInFavorites = isInFavorites
+                                roomDatabase.gameDataDao().update(gameDatasWithSameIds[1])
+                            }
                         }
-                    }
 
+                    }
+                    else
+                    {
+                        hasCachedGameData = true
+                        roomDatabase.gameDataDao().insert(*gameDataList.toTypedArray())
+                    }
                 }
+
             }
         }
 
@@ -303,7 +317,7 @@ class GameRepository private constructor(
 
         private var refreshIntervalInMs: Long = 25000L
         private var dataExpirationDurationInMs: Long = 1000 * 60 * 60L
-
+        private var shouldRetry: Boolean = true
 
         fun setApiService(apiService: GameAPIService): GameRepositoryBuilder
         {
@@ -327,15 +341,21 @@ class GameRepository private constructor(
 
         fun setRefreshIntervalInMs(value: Long): GameRepositoryBuilder
         {
-            require(value > 0, { "Refresh interval has to be bigger than 0" })
+            require(value >= 0, { "Refresh interval can't be negative" })
             this.refreshIntervalInMs = value
             return this
         }
 
         fun setDataExpirationDurationInMs(value: Long): GameRepositoryBuilder
         {
-            require(value > 0, { "Data expiration duration has to be bigger than 0" })
+            require(value >= 0, { "Data expiration can't be negative" })
             this.dataExpirationDurationInMs = value
+            return this
+        }
+
+        fun setShouldRetryWhenFailed(shouldRetry: Boolean): GameRepositoryBuilder
+        {
+            this.shouldRetry = shouldRetry
             return this
         }
 
@@ -355,7 +375,8 @@ class GameRepository private constructor(
                     roomDatabase!!,
                     config!!,
                     refreshIntervalInMs,
-                    dataExpirationDurationInMs)
+                    dataExpirationDurationInMs,
+                    shouldRetry)
         }
 
     }

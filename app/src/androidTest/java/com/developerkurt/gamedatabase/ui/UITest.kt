@@ -1,4 +1,4 @@
-package com.developerkurt.gamedatabase
+package com.developerkurt.gamedatabase.ui
 
 //TODO Write the tests and add more of them
 class UITest

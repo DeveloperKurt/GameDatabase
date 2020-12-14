@@ -25,6 +25,7 @@ class GameRepositoryModule
             .setApiService(apiService)
             .setRoomDatabase(roomAppDatabase)
             .setConfig(BaseRepository.RepositoryConfig.LOCAL_FIRST_CONTINUOUS_NETWORK_REFRESH)
+            .setShouldRetryWhenFailed(true)
             .create()
     }
 }

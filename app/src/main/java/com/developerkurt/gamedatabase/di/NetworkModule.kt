@@ -1,6 +1,7 @@
 package com.developerkurt.gamedatabase.di
 
 import com.developerkurt.gamedatabase.data.api.GameAPIService
+import com.developerkurt.gamedatabase.data.api.GameAPIServiceGenerator
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -16,6 +17,6 @@ class NetworkModule
     @Provides
     fun provideGameAPIService(): GameAPIService
     {
-        return GameAPIService.create()
+        return GameAPIServiceGenerator().create()
     }
 }

@@ -47,6 +47,7 @@ buildscript {
         retrofitVersion ='2.5.0'
         gsonVersion ='2.8.4'
         paletteVersion = '1.0.0'
+        mockWebServerVersion = '4.6.0'
 
     }
 
