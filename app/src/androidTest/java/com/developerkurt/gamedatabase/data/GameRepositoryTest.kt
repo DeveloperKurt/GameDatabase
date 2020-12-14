@@ -60,7 +60,6 @@ class GameRepositoryTest
     fun init()
     {
         hiltRule.inject()
-
     }
 
     @After
@@ -125,7 +124,7 @@ class GameRepositoryTest
             val gtaV = GameData(
                     3498,
                     "Grand Theft Auto V",
-                    "2020-09-17",
+                    "2013-09-17",
                     "https://media.rawg.io/media/games/84d/84da2ac3fdfc6507807a1808595afb12.jpg",
                     4.48f)
 
@@ -294,7 +293,7 @@ class NetworkTestingModule
 
 @InstallIn(SingletonComponent::class)
 @Module
-class PersistenceModule
+class PersistenceTestingModule
 {
 
     @Singleton
@@ -310,7 +309,7 @@ class PersistenceModule
 //Disable retry when failed to save from execution time.
 @InstallIn(SingletonComponent::class)
 @Module
-class GameRepositoryModule
+class GameRepositoryTestingModule
 {
     @Singleton
     @Provides
