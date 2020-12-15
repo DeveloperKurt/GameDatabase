@@ -155,6 +155,9 @@ class GameRepositoryTest
                         "1st statement: ${updatedList!!.contains(updatedDoom)}, 2nd statement: ${!updatedList!!.contains(doom)} "
             })
 
+            assert(updatedList!!.filter { it.name == "DOOM (2016)" }[0].isInFavorites == true,
+                    { "Favorite state was not preserved when the element received an update" })
+
             assert(updatedList!!.size == firstList.size)
 
         }
@@ -261,9 +264,12 @@ class GameRepositoryTest
 
     }
 
+
     private suspend fun cacheDefaultGameDataList(): List<GameData>
     {
         val gameList: GameDataList = Gson().fromJson(FileReader.readStringFromFile("success_game_list_response.json"), GameDataList::class.java)
+
+        gameList.list.filter { it.name == "DOOM (2016)" }[0].isInFavorites = true
 
         roomDatabase.gameDataDao().insert(*gameList.list.toTypedArray())
         return gameList.list
