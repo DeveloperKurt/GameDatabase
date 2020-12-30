@@ -46,6 +46,18 @@ android {
         enableTransformForLocalTests = true
     }
 
+    // Always show the result of every unit test, even if it passes.
+    testOptions.unitTests {
+        includeAndroidResources = true
+
+        all {
+            testLogging {
+                events 'passed', 'skipped', 'failed', 'standardOut', 'standardError'
+            }
+        }
+    }
+
+
 }
 
 dependencies {
@@ -98,10 +110,16 @@ dependencies {
     androidTestImplementation "androidx.test.ext:junit:$rootProject.testExtJunit"
     androidTestImplementation "androidx.test.uiautomator:uiautomator:$rootProject.uiAutomatorVersion"
     androidTestImplementation "com.google.dagger:hilt-android-testing:$rootProject.hiltVersion"
+    androidTestImplementation "androidx.fragment:fragment-testing:$rootProject.fragmentVersion"
+
     testImplementation "junit:junit:$rootProject.junitVersion"
     testImplementation "com.squareup.okhttp3:mockwebserver:$rootProject.mockWebServerVersion"
     androidTestImplementation "com.squareup.okhttp3:mockwebserver:$rootProject.mockWebServerVersion"
 
 
+    // Once https://issuetracker.google.com/127986458 is fixed this can be testImplementation
+    debugImplementation "androidx.fragment:fragment-testing:$fragmentVersion"
+    implementation "androidx.test:core:$androidXTestCoreVersion"
+    implementation "androidx.fragment:fragment:$fragmentVersion"
 
 }
