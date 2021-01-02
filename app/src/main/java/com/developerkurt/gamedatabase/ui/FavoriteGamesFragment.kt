@@ -36,7 +36,11 @@ class FavoriteGamesFragment : BaseDataFragment(), GameListAdapter.GameClickListe
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
-        (requireActivity() as MainActivity).displayBottomNavBar()
+        if (requireActivity() is MainActivity)
+        {
+            (requireActivity() as MainActivity).displayBottomNavBar()
+        }
+
 
         val gameListAdapter = GameListAdapter(this)
         binding.recyclerViewFavoriteGames.adapter = gameListAdapter

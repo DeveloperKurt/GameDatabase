@@ -1,4 +1,4 @@
-package com.developerkurt.gamedatabase
+package com.developerkurt.gamedatabase.util
 
 import androidx.test.platform.app.InstrumentationRegistry
 import java.io.InputStreamReader

@@ -31,11 +31,11 @@ class GameListFragmentTest
         hiltRule.inject()
     }
 
-
+    //TODO implement
     @Test
     fun gameListFragmentTest()
     {
-        launchFragmentInHiltContainer<GameListFragment>() {
+        launchFragmentInHiltContainer<GameListFragment> {
 
         }
     }

@@ -36,7 +36,12 @@ class GameDetailsFragment : BaseDataFragment(), View.OnClickListener
     {
         _binding = GameDetailsFragmentMotionSceneStartBinding.inflate(inflater, container, false)
         val view = binding.root
-        (requireActivity() as MainActivity).hideBottomNavBar()
+
+        if (requireActivity() is MainActivity)
+        {
+            (requireActivity() as MainActivity).hideBottomNavBar()
+        }
+
         return view
     }
 

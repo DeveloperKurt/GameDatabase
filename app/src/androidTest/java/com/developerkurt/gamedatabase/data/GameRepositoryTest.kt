@@ -3,7 +3,6 @@ package com.developerkurt.gamedatabase.data
 import android.content.Context
 import androidx.room.Room
 import androidx.test.filters.MediumTest
-import com.developerkurt.gamedatabase.FileReader
 import com.developerkurt.gamedatabase.data.api.GameAPIService
 import com.developerkurt.gamedatabase.data.api.GameAPIServiceGenerator
 import com.developerkurt.gamedatabase.data.model.GameData
@@ -12,6 +11,7 @@ import com.developerkurt.gamedatabase.data.persistence.RoomAppDatabase
 import com.developerkurt.gamedatabase.di.GameRepositoryModule
 import com.developerkurt.gamedatabase.di.NetworkModule
 import com.developerkurt.gamedatabase.di.PersistenceModule
+import com.developerkurt.gamedatabase.util.FileReader
 import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides

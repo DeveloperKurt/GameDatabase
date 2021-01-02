@@ -12,6 +12,7 @@ import com.developerkurt.gamedatabase.adapters.GameListAdapter
 import com.developerkurt.gamedatabase.adapters.ImagePagerAdapter
 import com.developerkurt.gamedatabase.data.model.GameData
 import com.developerkurt.gamedatabase.databinding.GameListFragmentBinding
+import com.developerkurt.gamedatabase.util.hideKeyboard
 import com.developerkurt.gamedatabase.viewmodels.GameListViewModel
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
@@ -26,6 +27,7 @@ class GameListFragment : BaseDataFragment(), GameListAdapter.GameClickListener
 
     private lateinit var gameListAdapter: GameListAdapter
     private lateinit var imagePagerAdapter: ImagePagerAdapter
+
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?): View?
@@ -41,7 +43,11 @@ class GameListFragment : BaseDataFragment(), GameListAdapter.GameClickListener
     {
         super.onViewCreated(view, savedInstanceState)
 
-        (requireActivity() as MainActivity).displayBottomNavBar()
+
+        if (requireActivity() is MainActivity)
+        {
+            (requireActivity() as MainActivity).displayBottomNavBar()
+        }
 
         initSearchBar()
 
