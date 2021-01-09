@@ -46,10 +46,10 @@ android {
         enableTransformForLocalTests = true
     }
 
-    // Always show the result of every unit test, even if it passes.
     testOptions.unitTests {
         includeAndroidResources = true
 
+        // Always show the result of every unit test, even when it passes.
         all {
             testLogging {
                 events 'passed', 'skipped', 'failed', 'standardOut', 'standardError'
@@ -57,9 +57,21 @@ android {
         }
     }
 
+    sourceSets {
+        String sharedTestDir = 'src/sharedTest/java'
+        test {
+            java.srcDir sharedTestDir
+        }
+        androidTest {
+            java.srcDir sharedTestDir
+        }
+    }
 
 }
 
+kapt {
+    correctErrorTypes = true
+}
 dependencies {
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
@@ -119,7 +131,7 @@ dependencies {
     testImplementation "junit:junit:$rootProject.junitVersion"
     androidTestImplementation "org.mockito:mockito-android:$rootProject.mockitoVersion"
     testImplementation "com.squareup.okhttp3:mockwebserver:$rootProject.mockWebServerVersion"
-
+    androidTestImplementation"org.jetbrains.kotlinx:kotlinx-coroutines-test:$rootProject.coroutinesVersion"
 
     // Once https://issuetracker.google.com/127986458 is fixed this can be testImplementation
     debugImplementation "androidx.fragment:fragment-testing:$rootProject.fragmentVersion"

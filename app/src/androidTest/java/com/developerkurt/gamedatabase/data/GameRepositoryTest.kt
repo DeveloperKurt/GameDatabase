@@ -1,10 +1,6 @@
 package com.developerkurt.gamedatabase.data
 
-import android.content.Context
-import androidx.room.Room
 import androidx.test.filters.MediumTest
-import com.developerkurt.gamedatabase.data.api.GameAPIService
-import com.developerkurt.gamedatabase.data.api.GameAPIServiceGenerator
 import com.developerkurt.gamedatabase.data.model.GameData
 import com.developerkurt.gamedatabase.data.model.GameDataList
 import com.developerkurt.gamedatabase.data.persistence.RoomAppDatabase
@@ -13,14 +9,9 @@ import com.developerkurt.gamedatabase.di.NetworkModule
 import com.developerkurt.gamedatabase.di.PersistenceModule
 import com.developerkurt.gamedatabase.util.FileReader
 import com.google.gson.Gson
-import dagger.Module
-import dagger.Provides
-import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.UninstallModules
-import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.drop
@@ -32,7 +23,6 @@ import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.*
 import javax.inject.Inject
-import javax.inject.Singleton
 
 @UninstallModules(NetworkModule::class, GameRepositoryModule::class, PersistenceModule::class)
 @HiltAndroidTest
@@ -277,60 +267,3 @@ class GameRepositoryTest
 
 
 }
-
-@InstallIn(SingletonComponent::class)
-@Module
-class NetworkTestingModule
-{
-
-    @Singleton
-    @Provides
-    fun provideMockWebServer(): MockWebServer = MockWebServer()
-
-
-    @Singleton
-    @Provides
-    fun provideGameAPIService(mockServer: MockWebServer): GameAPIService
-    {
-        return GameAPIServiceGenerator(baseUrl = mockServer.url("/").toString()).create()
-    }
-
-}
-
-@InstallIn(SingletonComponent::class)
-@Module
-class PersistenceTestingModule
-{
-
-    @Singleton
-    @Provides
-    fun provideRoomDatabase(@ApplicationContext applicationContext: Context): RoomAppDatabase
-    {
-        return Room.inMemoryDatabaseBuilder(
-                applicationContext, RoomAppDatabase::class.java).build()
-
-    }
-}
-
-//Disable retry when failed to save from execution time.
-@InstallIn(SingletonComponent::class)
-@Module
-class GameRepositoryTestingModule
-{
-    @Singleton
-    @Provides
-    fun provideGameRepository(
-            apiService: GameAPIService,
-            roomAppDatabase: RoomAppDatabase): GameRepository
-    {
-        return GameRepository.GameRepositoryBuilder()
-            .setApiService(apiService)
-            .setRoomDatabase(roomAppDatabase)
-            .setConfig(BaseRepository.RepositoryConfig.LOCAL_FIRST_CONTINUOUS_NETWORK_REFRESH)
-            .setShouldRetryWhenFailed(false)
-            .setRefreshIntervalInMs(0L)
-            .create()
-    }
-}
-
-

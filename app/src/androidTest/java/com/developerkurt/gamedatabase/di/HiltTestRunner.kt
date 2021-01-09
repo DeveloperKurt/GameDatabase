@@ -1,4 +1,4 @@
-package com.developerkurt.gamedatabase
+package com.developerkurt.gamedatabase.di
 
 import android.app.Application
 import android.content.Context

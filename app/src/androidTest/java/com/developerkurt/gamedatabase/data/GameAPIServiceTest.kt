@@ -2,6 +2,9 @@ package com.developerkurt.gamedatabase.data
 
 import androidx.test.filters.LargeTest
 import com.developerkurt.gamedatabase.data.api.GameAPIService
+import com.developerkurt.gamedatabase.di.GameRepositoryTestingModule
+import com.developerkurt.gamedatabase.di.NetworkTestingModule
+import com.developerkurt.gamedatabase.di.PersistenceTestingModule
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.UninstallModules
