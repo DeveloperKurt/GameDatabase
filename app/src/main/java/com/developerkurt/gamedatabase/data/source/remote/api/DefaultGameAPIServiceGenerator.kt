@@ -1,4 +1,4 @@
-package com.developerkurt.gamedatabase.data.api
+package com.developerkurt.gamedatabase.data.source.remote.api
 
 import com.developerkurt.gamedatabase.BuildConfig
 import okhttp3.OkHttpClient
@@ -8,7 +8,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
 //TODO [IMPROVEMENT] Use Moshi instead of GSON
-class GameAPIServiceGenerator(
+class DefaultGameAPIServiceGenerator(
         private val baseUrl: String = "https://rawg-video-games-database.p.rapidapi.com/",
         private val timeoutInSeconds: Long = 30L)
 {
@@ -18,7 +18,7 @@ class GameAPIServiceGenerator(
         require(timeoutInSeconds >= 0)
     }
 
-    fun create(): GameAPIService
+    fun create(): DefaultGameAPIService
     {
         val builder = OkHttpClient.Builder()
             .connectTimeout(timeoutInSeconds, TimeUnit.SECONDS)
@@ -39,6 +39,6 @@ class GameAPIServiceGenerator(
             .client(client)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
-            .create(GameAPIService::class.java)
+            .create(DefaultGameAPIService::class.java)
     }
 }

@@ -37,6 +37,7 @@ data class GameData(
     @ColumnInfo(name = IS_IN_FAVORITES_KEY)
     var isInFavorites: Boolean = false
 
+
 }
 
 /**

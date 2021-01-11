@@ -7,10 +7,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import com.developerkurt.gamedatabase.adapters.GameListAdapter
 import com.developerkurt.gamedatabase.adapters.ImagePagerAdapter
 import com.developerkurt.gamedatabase.data.model.GameData
+import com.developerkurt.gamedatabase.data.source.Result
 import com.developerkurt.gamedatabase.databinding.GameListFragmentBinding
 import com.developerkurt.gamedatabase.util.hideKeyboard
 import com.developerkurt.gamedatabase.viewmodels.GameListViewModel
@@ -73,18 +75,17 @@ class GameListFragment : BaseDataFragment(), GameListAdapter.GameClickListener
 
     private fun subscribeUi(gameListAdapter: GameListAdapter, imagePagerAdapter: ImagePagerAdapter)
     {
-        viewModel.getGameListLiveData().observe(viewLifecycleOwner, {
-            gameListAdapter.updateList(it)
-            imagePagerAdapter.update(it.take(3).map { it.imageUrl })
-        })
+        lifecycleScope.launchWhenStarted {
+            viewModel.getGameListResultLiveData().observe(viewLifecycleOwner, { result ->
+                if (result is Result.Success)
+                {
+                    gameListAdapter.updateList(result.data)
+                    imagePagerAdapter.update(result.data.take(3).map { it.imageUrl })
+                }
 
-        viewModel.dataStateLiveData.observe(viewLifecycleOwner, {
-            handleDataStateChange(it)
-        })
-
-
-        viewModel.getLatestGameList()
-
+                handleDataStateChange(result)
+            })
+        }
 
     }
 

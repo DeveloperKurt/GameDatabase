@@ -1,4 +1,4 @@
-package com.developerkurt.gamedatabase.data.api
+package com.developerkurt.gamedatabase.data.source.remote.api
 
 import com.developerkurt.gamedatabase.data.model.GameDataList
 import com.developerkurt.gamedatabase.data.model.GameDetails
@@ -7,9 +7,10 @@ import retrofit2.http.GET
 import retrofit2.http.Headers
 import retrofit2.http.Path
 
-interface GameAPIService
+interface DefaultGameAPIService
 {
 
+    //TODO [Improvement] utilize the coroutine support of Retrofit by making the API functions suspend
 
     @Headers(HEADER_KEY, HEADER_HOST)
     @GET("games")

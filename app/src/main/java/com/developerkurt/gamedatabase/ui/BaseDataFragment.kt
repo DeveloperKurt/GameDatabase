@@ -2,7 +2,8 @@ package com.developerkurt.gamedatabase.ui
 
 import androidx.fragment.app.Fragment
 import com.developerkurt.gamedatabase.R
-import com.developerkurt.gamedatabase.data.BaseRepository
+import com.developerkurt.gamedatabase.data.source.Result
+import com.developerkurt.gamedatabase.data.source.Result.*
 import com.google.android.material.snackbar.Snackbar
 
 abstract class BaseDataFragment : Fragment()
@@ -17,31 +18,31 @@ abstract class BaseDataFragment : Fragment()
 
     open protected fun showFailedToUpdateSnackBar() = failedToUpdateSnackBar.show()
 
-    fun handleDataStateChange(dataState: BaseRepository.DataState?)
+    fun handleDataStateChange(result: Result<*>)
     {
-
-        when (dataState)
+        when (result)
         {
 
-            BaseRepository.DataState.UNKNOWN -> changeLayoutStateToLoading()
+            is Loading -> changeLayoutStateToLoading()
+            is Error -> changeLayoutStateToError()
 
-            BaseRepository.DataState.SUCCESS ->
+            is Success ->
             {
                 changeLayoutStateToReady()
                 displayedErrorSnackbar = false
             }
 
-            BaseRepository.DataState.FAILED, null -> changeLayoutStateToError()
-
-            BaseRepository.DataState.FAILED_TO_UPDATE ->
+            is FailedToUpdate ->
             {
                 if (!displayedErrorSnackbar)
                 {
                     showFailedToUpdateSnackBar()
                     displayedErrorSnackbar = true
                 }
+
                 changeLayoutFailedUpdate()
             }
+
         }
     }
 }

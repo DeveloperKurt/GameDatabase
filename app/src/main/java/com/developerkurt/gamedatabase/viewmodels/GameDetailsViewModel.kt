@@ -3,11 +3,9 @@ package com.developerkurt.gamedatabase.viewmodels
 import androidx.hilt.Assisted
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
-import com.developerkurt.gamedatabase.data.BaseRepository
-import com.developerkurt.gamedatabase.data.GameRepository
 import com.developerkurt.gamedatabase.data.model.GameDetails
-import com.developerkurt.gamedatabase.util.stripHtml
-import kotlinx.coroutines.flow.collect
+import com.developerkurt.gamedatabase.data.source.GameRepository
+import com.developerkurt.gamedatabase.data.source.Result
 import kotlinx.coroutines.launch
 
 class GameDetailsViewModel @ViewModelInject internal constructor(
@@ -18,40 +16,18 @@ class GameDetailsViewModel @ViewModelInject internal constructor(
     val gameId: Int = savedStateHandle.get<Int>("gameId")!!
 
 
-    private val gameDetailsLiveData = MutableLiveData<GameDetails?>()
+    private val gameDetailsResultLiveData = MutableLiveData<Result<GameDetails>>(Result.Loading)
     private val isFavoriteLiveData = MutableLiveData(savedStateHandle.get<Boolean>("isInFavorites")!!)
-    private val mutableDataStateLiveData = MutableLiveData<BaseRepository.DataState>(BaseRepository.DataState.UNKNOWN)
 
-    fun getDataStateLiveData(): LiveData<BaseRepository.DataState> = mutableDataStateLiveData
     fun getIsFavoriteLiveData(): LiveData<Boolean> = isFavoriteLiveData
 
-    fun getGameDetailsLiveData(gameId: Int): LiveData<GameDetails?>
+    fun getGameDetailsResultLiveData(gameId: Int): LiveData<Result<GameDetails>>
     {
-
         viewModelScope.launch {
-
-
-            gameDetailsLiveData.postValue(
-                    gameRepository.fetchGameDetailsOnceFromDatabase(gameId).await()
-                        .also {
-                            if (it != null)
-                            {
-                                it.description = it.description.stripHtml()
-                                mutableDataStateLiveData.postValue(BaseRepository.DataState.SUCCESS)
-
-                            }
-                            else
-                            {
-                                mutableDataStateLiveData.postValue(BaseRepository.DataState.FAILED)
-                            }
-                        })
-
-            gameRepository.gameDetailsStateFlow().collect {
-                mutableDataStateLiveData.postValue(it)
-            }
+            gameDetailsResultLiveData.postValue(gameRepository.getGameDetails(gameId))
         }
-        return gameDetailsLiveData
 
+        return gameDetailsResultLiveData
     }
 
     fun favoriteStateChanged()

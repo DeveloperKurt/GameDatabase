@@ -13,7 +13,7 @@ import androidx.test.filters.SmallTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.developerkurt.gamedatabase.R
 import com.developerkurt.gamedatabase.TestBaseDataFragmentImp
-import com.developerkurt.gamedatabase.data.BaseRepository
+import com.developerkurt.gamedatabase.data.source.BaseRepository
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -27,7 +27,7 @@ import kotlin.reflect.KFunction
 @SmallTest
 class BaseDataFragmentTest
 {
-
+    //TODO - refactor
     @Mock lateinit var mockBaseDataFragment: TestBaseDataFragmentImp
 
     private val context = InstrumentationRegistry.getInstrumentation().getTargetContext()

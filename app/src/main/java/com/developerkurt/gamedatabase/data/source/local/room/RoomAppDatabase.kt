@@ -1,4 +1,4 @@
-package com.developerkurt.gamedatabase.data.persistence
+package com.developerkurt.gamedatabase.data.source.local.room
 
 import androidx.room.Database
 import androidx.room.RoomDatabase

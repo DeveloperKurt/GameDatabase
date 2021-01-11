@@ -9,10 +9,10 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import com.developerkurt.gamedatabase.adapters.GameListAdapter
 import com.developerkurt.gamedatabase.data.model.GameData
+import com.developerkurt.gamedatabase.data.source.Result
 import com.developerkurt.gamedatabase.databinding.FavoriteGamesFragmentBinding
 import com.developerkurt.gamedatabase.viewmodels.FavoriteGamesViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class FavoriteGamesFragment : BaseDataFragment(), GameListAdapter.GameClickListener
@@ -50,16 +50,14 @@ class FavoriteGamesFragment : BaseDataFragment(), GameListAdapter.GameClickListe
 
     private fun setupUI(gameListAdapter: GameListAdapter)
     {
-        viewModel.getFavoriteGameListLiveData().observe(viewLifecycleOwner, {
-            gameListAdapter.updateList(it)
-        })
-
-        viewModel.dataStateLiveData.observe(viewLifecycleOwner, {
-            handleDataStateChange(it)
-        })
-
-        lifecycleScope.launch {
-            viewModel.fetchTheList()
+        lifecycleScope.launchWhenStarted {
+            viewModel.getFavoriteGameListResultLiveData().observe(viewLifecycleOwner, { result ->
+                if (result is Result.Success)
+                {
+                    gameListAdapter.updateList(result.data)
+                }
+                handleDataStateChange(result)
+            })
         }
     }
 
