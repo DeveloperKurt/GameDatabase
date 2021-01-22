@@ -6,9 +6,10 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
+import androidx.navigation.navGraphViewModels
+import com.developerkurt.gamedatabase.R
 import com.developerkurt.gamedatabase.adapters.GameListAdapter
 import com.developerkurt.gamedatabase.adapters.ImagePagerAdapter
 import com.developerkurt.gamedatabase.data.model.GameData
@@ -25,7 +26,7 @@ import kotlinx.android.synthetic.main.game_list_fragment.*
 class GameListFragment : BaseDataFragment(), GameListAdapter.GameClickListener
 {
     private lateinit var binding: GameListFragmentBinding
-    private val viewModel: GameListViewModel by viewModels()
+    private val viewModel: GameListViewModel by navGraphViewModels(R.id.nav_graph) { defaultViewModelProviderFactory }
 
     private lateinit var gameListAdapter: GameListAdapter
     private lateinit var imagePagerAdapter: ImagePagerAdapter
@@ -59,15 +60,22 @@ class GameListFragment : BaseDataFragment(), GameListAdapter.GameClickListener
         recycler_view_game_data.adapter = gameListAdapter
         initViewPager(imagePagerAdapter)
 
-        subscribeUi(gameListAdapter, imagePagerAdapter)
 
+    }
+
+    override fun onResume()
+    {
+        super.onResume()
+        subscribeUi(gameListAdapter, imagePagerAdapter)
     }
 
     private fun initViewPager(imagePagerAdapter: ImagePagerAdapter)
     {
+        binding.viewPagerGameImages.setOffscreenPageLimit(2)
         binding.viewPagerGameImages.adapter = imagePagerAdapter
+
         TabLayoutMediator(tl_view_pager_scroll, view_pager_game_images) { tab, position ->
-            view_pager_game_images.setCurrentItem(tab.position, true)
+            binding.viewPagerGameImages.setCurrentItem(tab.position, true)
         }.attach()
 
     }

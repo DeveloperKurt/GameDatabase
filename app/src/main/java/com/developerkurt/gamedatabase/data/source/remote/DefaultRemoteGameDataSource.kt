@@ -34,7 +34,6 @@ class DefaultRemoteGameDataSource(
 
             CoroutineScope(Dispatchers.Default + coroutineContext).launch {
 
-                Timber.d("Before the cursed while loop: $isGettingContinuousUpdates")
                 while (currentCoroutineContext().isActive)
                 {
                     isGettingContinuousUpdates = true

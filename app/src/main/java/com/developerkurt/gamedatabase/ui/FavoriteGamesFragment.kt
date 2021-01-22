@@ -4,9 +4,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
+import androidx.navigation.navGraphViewModels
+import com.developerkurt.gamedatabase.R
 import com.developerkurt.gamedatabase.adapters.GameListAdapter
 import com.developerkurt.gamedatabase.data.model.GameData
 import com.developerkurt.gamedatabase.data.source.Result
@@ -17,12 +18,14 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class FavoriteGamesFragment : BaseDataFragment(), GameListAdapter.GameClickListener
 {
-    private val viewModel: FavoriteGamesViewModel by viewModels()
+    private val viewModel: FavoriteGamesViewModel by navGraphViewModels(R.id.nav_graph) { defaultViewModelProviderFactory }
 
 
     // This property is only valid between onCreateView and onDestroyView.
     private var _binding: FavoriteGamesFragmentBinding? = null
     private val binding get() = _binding!!
+
+    private lateinit var gameListAdapter: GameListAdapter
 
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
@@ -41,10 +44,14 @@ class FavoriteGamesFragment : BaseDataFragment(), GameListAdapter.GameClickListe
             (requireActivity() as MainActivity).displayBottomNavBar()
         }
 
-
-        val gameListAdapter = GameListAdapter(this)
+        gameListAdapter = GameListAdapter(this)
         binding.recyclerViewFavoriteGames.adapter = gameListAdapter
 
+    }
+
+    override fun onResume()
+    {
+        super.onResume()
         setupUI(gameListAdapter)
     }
 

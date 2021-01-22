@@ -65,12 +65,6 @@ class DefaultGameRepository(
 
         CoroutineScope(Dispatchers.IO + coroutineContext).launch {
             localSourceGameDataListFlow!!.collectLatest {
-
-                Timber.d("local data change EMITTING")
-                if (it is Result.Success)
-                {
-                    Timber.d("local data change favorite value of item 0: ${it.data[0].isInFavorites}")
-                }
                 gameDataListResultMutableLiveData.postValue(it)
             }
         }
