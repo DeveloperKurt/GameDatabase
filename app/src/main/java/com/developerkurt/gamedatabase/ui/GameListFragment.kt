@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.navigation.navGraphViewModels
+import androidx.viewpager2.widget.ViewPager2
 import com.developerkurt.gamedatabase.R
 import com.developerkurt.gamedatabase.adapters.GameListAdapter
 import com.developerkurt.gamedatabase.adapters.ImagePagerAdapter
@@ -20,16 +21,18 @@ import com.developerkurt.gamedatabase.viewmodels.GameListViewModel
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.game_list_fragment.*
+import timber.log.Timber
 
 
 @AndroidEntryPoint
 class GameListFragment : BaseDataFragment(), GameListAdapter.GameClickListener
 {
     private lateinit var binding: GameListFragmentBinding
-    private val viewModel: GameListViewModel by navGraphViewModels(R.id.nav_graph) { defaultViewModelProviderFactory }
+    private val viewModel: GameListViewModel by navGraphViewModels(R.id.game_list) { defaultViewModelProviderFactory }
 
     private lateinit var gameListAdapter: GameListAdapter
     private lateinit var imagePagerAdapter: ImagePagerAdapter
+
 
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
@@ -37,7 +40,7 @@ class GameListFragment : BaseDataFragment(), GameListAdapter.GameClickListener
     {
         binding = GameListFragmentBinding.inflate(inflater, container, false)
         val view = binding.root
-
+        Timber.d("onCreateView")
         return view
     }
 
@@ -60,8 +63,8 @@ class GameListFragment : BaseDataFragment(), GameListAdapter.GameClickListener
         recycler_view_game_data.adapter = gameListAdapter
         initViewPager(imagePagerAdapter)
 
-
     }
+
 
     override fun onResume()
     {
@@ -69,14 +72,41 @@ class GameListFragment : BaseDataFragment(), GameListAdapter.GameClickListener
         subscribeUi(gameListAdapter, imagePagerAdapter)
     }
 
+    override fun onDestroyView()
+    {
+        super.onDestroyView()
+        viewModel.isViewPagerCreationHandled = false
+    }
+
     private fun initViewPager(imagePagerAdapter: ImagePagerAdapter)
     {
         binding.viewPagerGameImages.setOffscreenPageLimit(2)
         binding.viewPagerGameImages.adapter = imagePagerAdapter
 
-        TabLayoutMediator(tl_view_pager_scroll, view_pager_game_images) { tab, position ->
-            binding.viewPagerGameImages.setCurrentItem(tab.position, true)
-        }.attach()
+
+        binding.viewPagerGameImages.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback()
+        {
+
+            override fun onPageSelected(position: Int)
+            {
+                super.onPageSelected(position)
+
+                var smoothScroll = false
+                if (viewModel.isViewPagerCreationHandled)
+                {
+                    viewModel.viewPagerPosition = position
+                    smoothScroll = true
+                }
+                else
+                {
+                    viewModel.isViewPagerCreationHandled = true
+                }
+
+                binding.viewPagerGameImages.setCurrentItem(viewModel.viewPagerPosition, smoothScroll)
+            }
+        })
+
+        TabLayoutMediator(tl_view_pager_scroll, view_pager_game_images) { tab, position -> }.attach()
 
     }
 
@@ -85,6 +115,7 @@ class GameListFragment : BaseDataFragment(), GameListAdapter.GameClickListener
     {
         lifecycleScope.launchWhenStarted {
             viewModel.getGameListResultLiveData().observe(viewLifecycleOwner, { result ->
+
                 if (result is Result.Success)
                 {
                     gameListAdapter.updateList(result.data)
@@ -94,7 +125,43 @@ class GameListFragment : BaseDataFragment(), GameListAdapter.GameClickListener
                 handleDataStateChange(result)
             })
         }
+    }
 
+    override fun handleDataStateChange(result: Result<*>)
+    {
+        when (result)
+        {
+
+            is Result.Loading -> changeLayoutStateToLoading()
+            is Result.Error -> changeLayoutStateToError()
+
+            is Result.Success ->
+            {
+                //If there was a searched term, keep displaying its results
+                if (viewModel.searchedTerm.isBlank())
+                {
+                    changeLayoutStateToReady()
+                }
+                else
+                {
+                    changeLayoutStateToSearchResults(gameListAdapter.filterByName(viewModel.searchedTerm))
+                }
+
+                displayedErrorSnackbar = false
+            }
+
+            is Result.FailedToUpdate ->
+            {
+                if (!displayedErrorSnackbar)
+                {
+                    showFailedToUpdateSnackBar()
+                    displayedErrorSnackbar = true
+                }
+
+                changeLayoutFailedUpdate()
+            }
+
+        }
     }
 
     private fun initSearchBar()
@@ -107,12 +174,14 @@ class GameListFragment : BaseDataFragment(), GameListAdapter.GameClickListener
                 if (s.length >= 3)
                 {
                     changeLayoutStateToSearchResults(gameListAdapter.filterByName(s.toString()))
+                    viewModel.searchedTerm = s.toString()
 
                 }
                 else if (s.length < 3)
                 {
                     gameListAdapter.removeFilter()
                     changeLayoutStateToReady()
+                    viewModel.searchedTerm = ""
                 }
             }
 
@@ -186,8 +255,11 @@ class GameListFragment : BaseDataFragment(), GameListAdapter.GameClickListener
 
     private fun navigateToGameDetails(gameData: GameData)
     {
+
         val direction = GameListFragmentDirections.actionGameListFragmentToGameDetailsFragment(gameData.id, gameData.isInFavorites)
+
         binding.root.findNavController().navigate(direction)
+
     }
 
 }

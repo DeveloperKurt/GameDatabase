@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/game_list"
+    app:startDestination="@id/gameListFragment">
+
+    <fragment
+        android:id="@+id/gameListFragment"
+        android:name="com.developerkurt.gamedatabase.ui.GameListFragment"
+        android:label="GameListFragment"
+        tools:layout="@layout/game_list_fragment">
+        <action
+            android:id="@+id/action_gameListFragment_to_gameDetailsFragment"
+            app:destination="@id/gameDetailsFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/gameDetailsFragment"
+        android:name="com.developerkurt.gamedatabase.ui.GameDetailsFragment"
+        android:label="GameDetailsFragment"
+        tools:layout="@layout/game_details_fragment_motion_scene_end">
+        <argument
+            android:name="gameId"
+            app:argType="integer" />
+        <argument
+            android:name="isInFavorites"
+            app:argType="boolean" />
+    </fragment>
+</navigation>

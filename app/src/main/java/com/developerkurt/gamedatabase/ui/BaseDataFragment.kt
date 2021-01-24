@@ -8,7 +8,7 @@ import com.google.android.material.snackbar.Snackbar
 
 abstract class BaseDataFragment : Fragment()
 {
-    private var displayedErrorSnackbar = false
+    protected var displayedErrorSnackbar = false
     protected val failedToUpdateSnackBar by lazy { Snackbar.make(this.requireView(), R.string.data_update_fail, Snackbar.LENGTH_LONG) }
 
     abstract protected fun changeLayoutStateToLoading()
@@ -18,7 +18,7 @@ abstract class BaseDataFragment : Fragment()
 
     open protected fun showFailedToUpdateSnackBar() = failedToUpdateSnackBar.show()
 
-    fun handleDataStateChange(result: Result<*>)
+    protected open fun handleDataStateChange(result: Result<*>)
     {
         when (result)
         {

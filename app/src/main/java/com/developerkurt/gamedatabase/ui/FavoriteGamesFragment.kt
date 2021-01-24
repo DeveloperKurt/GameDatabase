@@ -18,7 +18,7 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class FavoriteGamesFragment : BaseDataFragment(), GameListAdapter.GameClickListener
 {
-    private val viewModel: FavoriteGamesViewModel by navGraphViewModels(R.id.nav_graph) { defaultViewModelProviderFactory }
+    private val viewModel: FavoriteGamesViewModel by navGraphViewModels(R.id.fav_games) { defaultViewModelProviderFactory }
 
 
     // This property is only valid between onCreateView and onDestroyView.
@@ -48,6 +48,7 @@ class FavoriteGamesFragment : BaseDataFragment(), GameListAdapter.GameClickListe
         binding.recyclerViewFavoriteGames.adapter = gameListAdapter
 
     }
+
 
     override fun onResume()
     {
@@ -106,7 +107,9 @@ class FavoriteGamesFragment : BaseDataFragment(), GameListAdapter.GameClickListe
 
     private fun navigateToGameDetails(gameData: GameData)
     {
+
         val direction = FavoriteGamesFragmentDirections.actionFavoriteGamesFragmentToGameDetailsFragment(gameData.id, gameData.isInFavorites)
         binding.root.findNavController().navigate(direction)
+
     }
 }

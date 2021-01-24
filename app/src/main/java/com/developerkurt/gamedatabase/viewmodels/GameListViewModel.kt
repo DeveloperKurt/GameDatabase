@@ -11,5 +11,9 @@ import com.developerkurt.gamedatabase.data.source.Result
 
 class GameListViewModel @ViewModelInject internal constructor(private val gameRepository: GameRepository) : ViewModel()
 {
-   suspend fun getGameListResultLiveData(): LiveData<Result<List<GameData>>> = gameRepository.observeGameDataList()
+    var isViewPagerCreationHandled = false
+    var viewPagerPosition = 0
+    var searchedTerm = ""
+
+    suspend fun getGameListResultLiveData(): LiveData<Result<List<GameData>>> = gameRepository.observeGameDataList()
 }

@@ -4,9 +4,7 @@ import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.developerkurt.gamedatabase.data.source.GameRepository
-import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class SplashViewModel @ViewModelInject internal constructor(
@@ -17,13 +15,13 @@ class SplashViewModel @ViewModelInject internal constructor(
 
     fun getIsLoadedLiveData(): LiveData<Boolean> = isLoadedLiveData
 
-    fun prepareData()
+    suspend fun prepareData()
     {
-        viewModelScope.launch {
-            val didPrepareData = gameRepository.prepareGameDataList()
-            Timber.i("Prepared the data: $didPrepareData")
 
-            isLoadedLiveData.value = true
-        }
+        val didPrepareData = gameRepository.prepareGameDataList()
+        Timber.i("Prepared the data: $didPrepareData")
+
+        isLoadedLiveData.value = true
+
     }
 }
