@@ -4,21 +4,21 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
-import androidx.navigation.navGraphViewModels
-import com.developerkurt.gamedatabase.R
 import com.developerkurt.gamedatabase.adapters.GameListAdapter
 import com.developerkurt.gamedatabase.data.model.GameData
 import com.developerkurt.gamedatabase.data.source.Result
 import com.developerkurt.gamedatabase.databinding.FavoriteGamesFragmentBinding
 import com.developerkurt.gamedatabase.viewmodels.FavoriteGamesViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import timber.log.Timber
 
 @AndroidEntryPoint
 class FavoriteGamesFragment : BaseDataFragment(), GameListAdapter.GameClickListener
 {
-    private val viewModel: FavoriteGamesViewModel by navGraphViewModels(R.id.fav_games) { defaultViewModelProviderFactory }
+    private val viewModel: FavoriteGamesViewModel by viewModels()
 
 
     // This property is only valid between onCreateView and onDestroyView.
@@ -60,11 +60,22 @@ class FavoriteGamesFragment : BaseDataFragment(), GameListAdapter.GameClickListe
     {
         lifecycleScope.launchWhenStarted {
             viewModel.getFavoriteGameListResultLiveData().observe(viewLifecycleOwner, { result ->
-                if (result is Result.Success)
+                if (activity != null)
                 {
-                    gameListAdapter.updateList(result.data)
+                    requireActivity().runOnUiThread {
+                        if (result is Result.Success)
+                        {
+
+                            gameListAdapter.updateList(result.data)
+
+                        }
+                        else
+                        {
+                            Timber.w("FragmentActivity was null, couldn't update the views' data")
+                        }
+                        handleDataStateChange(result)
+                    }
                 }
-                handleDataStateChange(result)
             })
         }
     }

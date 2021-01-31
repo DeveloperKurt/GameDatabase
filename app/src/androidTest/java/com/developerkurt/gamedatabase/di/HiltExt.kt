@@ -50,6 +50,8 @@ inline fun <reified T : Fragment> launchFragmentInHiltContainer(
                 Preconditions.checkNotNull(T::class.java.classLoader),
                 T::class.java.name)
 
+
+
         fragment.arguments = fragmentArgs
         activity.supportFragmentManager
             .beginTransaction()

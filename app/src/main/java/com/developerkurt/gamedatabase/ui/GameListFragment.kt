@@ -6,11 +6,10 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
-import androidx.navigation.navGraphViewModels
 import androidx.viewpager2.widget.ViewPager2
-import com.developerkurt.gamedatabase.R
 import com.developerkurt.gamedatabase.adapters.GameListAdapter
 import com.developerkurt.gamedatabase.adapters.ImagePagerAdapter
 import com.developerkurt.gamedatabase.data.model.GameData
@@ -28,7 +27,7 @@ import timber.log.Timber
 class GameListFragment : BaseDataFragment(), GameListAdapter.GameClickListener
 {
     private lateinit var binding: GameListFragmentBinding
-    private val viewModel: GameListViewModel by navGraphViewModels(R.id.game_list) { defaultViewModelProviderFactory }
+    private val viewModel: GameListViewModel by viewModels()
 
     private lateinit var gameListAdapter: GameListAdapter
     private lateinit var imagePagerAdapter: ImagePagerAdapter
@@ -40,7 +39,6 @@ class GameListFragment : BaseDataFragment(), GameListAdapter.GameClickListener
     {
         binding = GameListFragmentBinding.inflate(inflater, container, false)
         val view = binding.root
-        Timber.d("onCreateView")
         return view
     }
 
@@ -115,14 +113,24 @@ class GameListFragment : BaseDataFragment(), GameListAdapter.GameClickListener
     {
         lifecycleScope.launchWhenStarted {
             viewModel.getGameListResultLiveData().observe(viewLifecycleOwner, { result ->
-
-                if (result is Result.Success)
+                if (activity != null)
                 {
-                    gameListAdapter.updateList(result.data)
-                    imagePagerAdapter.update(result.data.take(3).map { it.imageUrl })
-                }
+                    requireActivity().runOnUiThread {
+                        if (result is Result.Success)
+                        {
 
-                handleDataStateChange(result)
+                            gameListAdapter.updateList(result.data)
+                            imagePagerAdapter.update(result.data.take(3).map { it.imageUrl })
+                        }
+
+                        handleDataStateChange(result)
+                    }
+
+                }
+                else
+                {
+                    Timber.w("FragmentActivity was null, couldn't update the view's data")
+                }
             })
         }
     }

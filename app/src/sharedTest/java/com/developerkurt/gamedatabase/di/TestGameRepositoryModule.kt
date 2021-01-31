@@ -3,8 +3,8 @@ package com.developerkurt.gamedatabase.di
 import com.developerkurt.gamedatabase.data.source.DefaultGameRepository
 import com.developerkurt.gamedatabase.data.source.GameRepository
 import com.developerkurt.gamedatabase.data.source.fake.FakeGameRepository
-import dagger.Binds
 import dagger.Module
+import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
@@ -14,9 +14,9 @@ import javax.inject.Singleton
  */
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class TestGameRepositoryModule
+object TestGameRepositoryModule
 {
     @Singleton
-    @Binds
-    abstract fun bindRepository(repository: FakeGameRepository): GameRepository
+    @Provides
+    fun provideFakeRepository(): GameRepository = FakeGameRepository()
 }

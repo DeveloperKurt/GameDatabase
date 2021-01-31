@@ -53,14 +53,13 @@ fun BottomNavigationView.setupWithNavController(
     // First create a NavHostFragment for each NavGraph ID
     navGraphIds.forEachIndexed { index, navGraphId ->
         val fragmentTag = getFragmentTag(index)
-        Timber.d("creating NavHostFragment for id: $navGraphId")
+        Timber.i("creating NavHostFragment with the id: $navGraphId")
         // Find or create the Navigation host fragment
         val navHostFragment = obtainNavHostFragment(
                 fragmentManager,
                 fragmentTag,
                 navGraphId,
-                containerId
-                                                   )
+                containerId)
 
         // Obtain its id
         val graphId = navHostFragment.navController.graph.id
@@ -76,14 +75,14 @@ fun BottomNavigationView.setupWithNavController(
         // Attach or detach nav host fragment depending on whether it's the selected item.
         if (this.selectedItemId == graphId)
         {
-            Timber.d("attaching NavHostFragment with id: $navGraphId")
+            Timber.i("attaching NavHostFragment with the id: $navGraphId")
             // Update livedata with the selected graph
             selectedNavController.value = navHostFragment.navController
             attachNavHostFragment(fragmentManager, navHostFragment, index == 0)
         }
         else
         {
-            Timber.d("detaching NavHostFragment with id: $navGraphId")
+            Timber.i("detaching NavHostFragment with the id: $navGraphId")
 
             detachNavHostFragment(fragmentManager, navHostFragment)
         }
@@ -94,24 +93,20 @@ fun BottomNavigationView.setupWithNavController(
     val firstFragmentTag = graphIdToTagMap[firstFragmentGraphId]
     var isOnFirstFragment = selectedItemTag == firstFragmentTag
 
-    Timber.d(
-            "connecting item with spawing farmgents. selectedItemId: $selectedItemId," +
-                    " firstFragmentTag: $firstFragmentTag, isOnFirstFragment: $isOnFirstFragment")
 
     // When a navigation item is selected
     setOnNavigationItemSelectedListener { item ->
-        Timber.d("navigation item selected,item: $item")
+        Timber.i("navigation item selected: $item")
 
         // Don't do anything if the state is state has already been saved.
         if (fragmentManager.isStateSaved)
         {
-            Timber.d("stateSaved not doing anything")
-
+            Timber.i("stateSaved not doing anything")
             false
         }
         else
         {
-            Timber.d("state is not Saved popping and attaching")
+            Timber.i("state is not Saved popping and attaching")
 
             val newlySelectedItemTag = graphIdToTagMap[item.itemId]
             if (selectedItemTag != newlySelectedItemTag)
@@ -156,7 +151,7 @@ fun BottomNavigationView.setupWithNavController(
             }
             else
             {
-                Timber.d("First fragment, excluding")
+                Timber.i("First fragment, excluding")
                 false
             }
         }
@@ -170,7 +165,7 @@ fun BottomNavigationView.setupWithNavController(
 
     // Finally, ensure that we update our BottomNavigationView when the back stack changes
     fragmentManager.addOnBackStackChangedListener {
-        Timber.d("updating BottomNavigationView")
+        Timber.i("updating BottomNavigationView")
 
         if (!isOnFirstFragment && !fragmentManager.isOnBackStack(firstFragmentTag))
         {
@@ -182,7 +177,7 @@ fun BottomNavigationView.setupWithNavController(
         selectedNavController.value?.let { controller ->
             if (controller.currentDestination == null)
             {
-                Timber.d("Reset the graph")
+                Timber.i("Resetting the graph")
 
                 controller.navigate(controller.graph.id)
             }
