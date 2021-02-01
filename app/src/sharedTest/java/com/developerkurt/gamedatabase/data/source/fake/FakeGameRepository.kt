@@ -24,6 +24,11 @@ class FakeGameRepository : GameRepository()
 
     var gameDetails: GameDetails? = null
 
+    /**
+     * You can manipulate this variable to make [getGameDetails] to return loading result
+     */
+    var isGameDetailsLoading = false
+
     private val mutableGameListLiveData = MutableLiveData<Result<List<GameData>>>(Result.Loading)
 
     override suspend fun observeGameDataList(): LiveData<Result<List<GameData>>> = mutableGameListLiveData
@@ -34,7 +39,7 @@ class FakeGameRepository : GameRepository()
     {
     }
 
-    override suspend fun getGameDetails(gameId: Int): Result<GameDetails> = mapGameDetailsToResult(gameDetails)
+    override suspend fun getGameDetails(gameId: Int): Result<GameDetails> = mapGameDetailsToResult(gameDetails, isGameDetailsLoading)
 
 
     override suspend fun updateIsFavorite(gameId: Int, isFavorite: Boolean)

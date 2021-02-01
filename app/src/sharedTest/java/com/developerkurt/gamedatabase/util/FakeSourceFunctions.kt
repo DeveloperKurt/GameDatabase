@@ -16,8 +16,10 @@ fun mapGameDataListToResult(gameList: MutableList<GameData>?): Result<List<GameD
     }
 }
 
-fun mapGameDetailsToResult(gameDetails: GameDetails?): Result<GameDetails>
+fun mapGameDetailsToResult(gameDetails: GameDetails?, shouldItBeLoading: Boolean = false): Result<GameDetails>
 {
+    if (shouldItBeLoading) return Result.Loading
+
     return if (gameDetails == null)
     {
         Result.Error()
