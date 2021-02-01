@@ -66,7 +66,7 @@ class GameListFragmentTest
         (repository as FakeGameRepository).gameList = null
         launchFragmentInHiltContainer<GameListFragment>(Bundle(), R.style.Theme_GameDatabase)
 
-        assertFailedStateVisibilities()
+        assertErrorStateVisibilities()
 
 
     }
@@ -92,7 +92,7 @@ class GameListFragmentTest
         assertSuccessStateVisibilities()
 
         (repository as FakeGameRepository).gameList = mutableListOf()
-        assertFailedStateVisibilities()
+        assertErrorStateVisibilities()
 
         (repository as FakeGameRepository).gameList = mutableListOf(gameData1)
         assertSuccessStateVisibilities()
@@ -148,7 +148,7 @@ class GameListFragmentTest
         onView(withId(R.id.tl_view_pager_scroll)).check(matches(isDisplayed()))
     }
 
-    private fun assertFailedStateVisibilities()
+    private fun assertErrorStateVisibilities()
     {
         onView(withId(R.id.progressBar)).check(matches(not(isDisplayed())))
         onView(withId(R.id.view_pager_game_images)).check(matches(not(isDisplayed())))
