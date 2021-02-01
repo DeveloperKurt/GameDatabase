@@ -1,20 +1,37 @@
 package com.developerkurt.gamedatabase.ui
 
 
+import android.os.Bundle
+import androidx.fragment.app.testing.launchFragmentInContainer
+import androidx.test.annotation.UiThreadTest
+import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
+import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
+import androidx.test.platform.app.InstrumentationRegistry
+import com.developerkurt.gamedatabase.R
+import com.developerkurt.gamedatabase.TestBaseDataFragmentImp
+import com.developerkurt.gamedatabase.data.source.Result
+import org.junit.Before
+import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Mock
+import org.mockito.Mockito.*
+import org.mockito.MockitoAnnotations
+import kotlin.reflect.KFunction
 
 
 @RunWith(AndroidJUnit4::class)
 @SmallTest
 class BaseDataFragmentTest
 {
-    //TODO - refactor
- /*   @Mock lateinit var mockBaseDataFragment: TestBaseDataFragmentImp
+
+    @Mock lateinit var mockBaseDataFragment: TestBaseDataFragmentImp
 
     private val context = InstrumentationRegistry.getInstrumentation().getTargetContext()
-    private val failedToUpdateToastString: String = context.resources.getString(com.developerkurt.gamedatabase.R.string.data_update_fail)
+    private val failedToUpdateToastString: String = context.resources.getString(R.string.data_update_fail)
 
     private val fragmentScenario by lazy { launchFragmentInContainer<TestBaseDataFragmentImp>(Bundle(), R.style.Theme_AppCompat) }
     private val baseTransientBottomBarFadeAnimationDuration = 180L
@@ -26,48 +43,42 @@ class BaseDataFragmentTest
     }
 
     @Test
-    fun handlingTheUNKNOWNDataStateProperly()
+    fun handlingTheLOADINGStateProperly()
     {
-        mockBaseDataFragment.handleDataStateChange(BaseRepository.DataState.UNKNOWN)
-        assertInvocationsTimesForDataStateCallbacks(BaseRepository.DataState.UNKNOWN)
+        mockBaseDataFragment.handleDataStateChange(Result.Loading)
+        assertInvocationTimesForResultCallbacks(Result.Loading)
     }
 
     @Test
     @UiThreadTest
-    fun handlingTheFAILED_TO_UPDATEDataStateProperly()
+    fun handlingTheFAILED_TO_UPDATEStateProperly()
     {
         val mockitoSpy = spy(TestBaseDataFragmentImp::class.java)
         doNothing().`when`(mockitoSpy).showFailedToUpdateSnackBar()
-        mockBaseDataFragment.handleDataStateChange(BaseRepository.DataState.FAILED_TO_UPDATE)
-        assertInvocationsTimesForDataStateCallbacks(BaseRepository.DataState.FAILED_TO_UPDATE)
+        mockBaseDataFragment.handleDataStateChange(Result.FailedToUpdate)
+        assertInvocationTimesForResultCallbacks(Result.FailedToUpdate)
     }
 
     @Test
-    fun handlingTheFAILEDataStateProperly()
+    fun handlingTheFAILEStateProperly()
     {
-        mockBaseDataFragment.handleDataStateChange(BaseRepository.DataState.FAILED)
-        assertInvocationsTimesForDataStateCallbacks(BaseRepository.DataState.FAILED)
+        mockBaseDataFragment.handleDataStateChange(Result.Error())
+        assertInvocationTimesForResultCallbacks(Result.Error())
     }
 
     @Test
-    fun handlingTheSUCCESSDataStateProperly()
+    fun handlingTheSUCCESSStateProperly()
     {
-        mockBaseDataFragment.handleDataStateChange(BaseRepository.DataState.SUCCESS)
-        assertInvocationsTimesForDataStateCallbacks(BaseRepository.DataState.SUCCESS)
+        mockBaseDataFragment.handleDataStateChange(Result.Success(null))
+        assertInvocationTimesForResultCallbacks(Result.Success(null))
     }
 
-    @Test
-    fun handlingTheNULLDataStateProperly()
-    {
-        mockBaseDataFragment.handleDataStateChange(null)
-        assertInvocationsTimesForDataStateCallbacks(null)
-    }
 
     @Test
     fun isDisplayingSnackbarWhenFAILED_TO_UPDATE()
     {
         fragmentScenario.onFragment {
-            it.handleDataStateChange(BaseRepository.DataState.FAILED_TO_UPDATE)
+            it.handleDataStateChange(Result.FailedToUpdate)
 
         }
         onView(withId(com.google.android.material.R.id.snackbar_text)).check(matches(withText(failedToUpdateToastString)))
@@ -75,15 +86,14 @@ class BaseDataFragmentTest
     }
 
 
-    */
     /**
      * Makes sure the Snackbar is not displayed repeatedly when data requests keeps on failing to update.
-     *//*
+     */
     @Test
     fun isDisplayingSnackbarOnlyOnceWhenFAILED_TO_UPDATE()
     {
         fragmentScenario.onFragment {
-            it.handleDataStateChange(BaseRepository.DataState.FAILED_TO_UPDATE)
+            it.handleDataStateChange(Result.FailedToUpdate)
         }
 
         onView(withId(com.google.android.material.R.id.snackbar_text)).check(matches(withText(failedToUpdateToastString)))
@@ -92,7 +102,7 @@ class BaseDataFragmentTest
 
         fragmentScenario.onFragment {
             it.dismissFailedToUpdateSnackBar()
-            it.handleDataStateChange(BaseRepository.DataState.FAILED_TO_UPDATE)
+            it.handleDataStateChange(Result.FailedToUpdate)
         }
 
         Thread.sleep(baseTransientBottomBarFadeAnimationDuration * 2)
@@ -102,17 +112,16 @@ class BaseDataFragmentTest
     }
 
 
-    */
     /**
      * Makes sure the Snackbar is displayed after these DataState changes happen:
      * FAILED_TO_UPDATE -> SUCCESS -> FAILED_TO_UPDATE
      *
-     *//*
+     */
     @Test
     fun isDisplayingToastAfterRecoveredStateFailsAgain()
     {
         fragmentScenario.onFragment {
-            it.handleDataStateChange(BaseRepository.DataState.FAILED_TO_UPDATE)
+            it.handleDataStateChange(Result.FailedToUpdate)
         }
 
         onView(withId(com.google.android.material.R.id.snackbar_text)).check(matches(withText(failedToUpdateToastString)))
@@ -125,21 +134,29 @@ class BaseDataFragmentTest
 
 
         fragmentScenario.onFragment {
-            it.handleDataStateChange(BaseRepository.DataState.SUCCESS)
-            it.handleDataStateChange(BaseRepository.DataState.FAILED_TO_UPDATE)
+            it.handleDataStateChange(Result.Success(null))
+            it.handleDataStateChange(Result.FailedToUpdate)
         }
 
         onView(withId(com.google.android.material.R.id.snackbar_text)).check(matches(withText(failedToUpdateToastString)))
             .check(matches(withEffectiveVisibility(Visibility.VISIBLE)))
     }
 
-    fun assertInvocationsTimesForDataStateCallbacks(dataState: BaseRepository.DataState?)
+
+    /**
+     * Asserts that only the corresponding result function is called
+     */
+    fun assertInvocationTimesForResultCallbacks(result: Result<*>)
     {
-        val givenDataStateFunction = getCorrespondingFunctionToDataState(dataState)
+        val resultFunctions = listOf(
+                getCorrespondingResultFunction(Result.Error()),
+                getCorrespondingResultFunction(Result.Success(null)),
+                getCorrespondingResultFunction(Result.FailedToUpdate),
+                getCorrespondingResultFunction(Result.Loading))
 
+        val givenDataStateFunction = getCorrespondingResultFunction(result)
 
-        enumValues<BaseRepository.DataState>().forEach {
-            val currentDataStateFunction = getCorrespondingFunctionToDataState(it)
+        resultFunctions.forEach { currentDataStateFunction ->
 
             if (givenDataStateFunction == currentDataStateFunction)
             {
@@ -155,15 +172,15 @@ class BaseDataFragmentTest
     }
 
 
-    fun getCorrespondingFunctionToDataState(dataState: BaseRepository.DataState?): KFunction<Unit> = when (dataState)
+    fun getCorrespondingResultFunction(result: Result<*>): KFunction<Unit> = when (result)
     {
-        BaseRepository.DataState.UNKNOWN -> mockBaseDataFragment::changeLayoutStateToLoading
+        is Result.Loading -> mockBaseDataFragment::changeLayoutStateToLoading
 
-        BaseRepository.DataState.SUCCESS -> mockBaseDataFragment::changeLayoutStateToReady
+        is Result.Success -> mockBaseDataFragment::changeLayoutStateToReady
 
-        BaseRepository.DataState.FAILED, null -> mockBaseDataFragment::changeLayoutStateToError
+        is Result.Error -> mockBaseDataFragment::changeLayoutStateToError
 
-        BaseRepository.DataState.FAILED_TO_UPDATE -> mockBaseDataFragment::changeLayoutFailedUpdate
-    }*/
+        is Result.FailedToUpdate -> mockBaseDataFragment::changeLayoutFailedUpdate
+    }
 
 }

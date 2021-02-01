@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.developerkurt.gamedatabase.data.source.Result
 import com.developerkurt.gamedatabase.ui.BaseDataFragment
 
 /**
@@ -12,6 +13,11 @@ import com.developerkurt.gamedatabase.ui.BaseDataFragment
 open class TestBaseDataFragmentImp : BaseDataFragment()
 {
     fun dismissFailedToUpdateSnackBar() = failedToUpdateSnackBar.dismiss()
+
+    override public fun handleDataStateChange(result: Result<*>)
+    {
+        super.handleDataStateChange(result)
+    }
 
     override public fun showFailedToUpdateSnackBar()
     {
