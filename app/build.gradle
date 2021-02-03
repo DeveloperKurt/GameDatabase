@@ -22,15 +22,21 @@ android {
         applicationId "com.developerkurt.gamedatabase"
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        versionCode 3
+        versionName "2.0"
 
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "com.developerkurt.gamedatabase.HiltTestRunner"
     }
 
     buildTypes {
         release {
             minifyEnabled false
+            testCoverageEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            minifyEnabled false
+            testCoverageEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
@@ -41,8 +47,40 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+
+    hilt {
+        enableTransformForLocalTests = true
+    }
+
+    testOptions.unitTests {
+        includeAndroidResources = true
+
+        // Always show the result of every unit test, even when it passes.
+        all {
+            testLogging {
+                events 'passed', 'skipped', 'failed', 'standardOut', 'standardError'
+            }
+        }
+    }
+
+
+    sourceSets {
+        String sharedTestDir = 'src/sharedTest/java'
+
+        test {
+            java.srcDirs += sharedTestDir
+        }
+        androidTest {
+            java.srcDirs += sharedTestDir
+        }
+    }
+
+
 }
 
+kapt {
+    correctErrorTypes = true
+}
 dependencies {
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
@@ -81,19 +119,45 @@ dependencies {
     implementation "com.squareup.retrofit2:converter-gson:$rootProject.retrofitVersion"
     implementation "com.google.code.gson:gson:$rootProject.gsonVersion"
     implementation "androidx.palette:palette:$rootProject.paletteVersion"
-
-
+    implementation "org.jetbrains.kotlin:kotlin-reflect:$rootProject.reflectVersion"
+    implementation "androidx.test.espresso:espresso-idling-resource:$rootProject.espressoVersion"
 
     // Testing dependencies
     kaptAndroidTest "com.google.dagger:hilt-android-compiler:$rootProject.hiltVersion"
-    androidTestImplementation "androidx.arch.core:core-testing:$rootProject.coreTestingVersion"
+    androidTestImplementation "androidx.test:core-ktx:$rootProject.androidXTestCoreVersion"
+    androidTestImplementation "androidx.test:rules:$rootProject.coreTestingVersion"
     androidTestImplementation "androidx.test.espresso:espresso-contrib:$rootProject.espressoVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$rootProject.espressoVersion"
     androidTestImplementation "androidx.test.espresso:espresso-intents:$rootProject.espressoVersion"
-    androidTestImplementation "androidx.test.ext:junit:$rootProject.testExtJunit"
+    androidTestImplementation "androidx.test.ext:junit-ktx:$rootProject.testExtJunit"
     androidTestImplementation "androidx.test.uiautomator:uiautomator:$rootProject.uiAutomatorVersion"
     androidTestImplementation "com.google.dagger:hilt-android-testing:$rootProject.hiltVersion"
+    androidTestImplementation "androidx.fragment:fragment-testing:$rootProject.fragmentVersion"
+    androidTestImplementation "com.squareup.okhttp3:mockwebserver:$rootProject.mockWebServerVersion"
+    androidTestImplementation "androidx.fragment:fragment-testing:$rootProject.fragmentVersion"
+    androidTestImplementation "org.mockito:mockito-android:$rootProject.mockitoVersion"
+    androidTestImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$rootProject.coroutinesVersion"
+    androidTestImplementation "androidx.navigation:navigation-testing:$rootProject.nav_version"
+    androidTestImplementation "androidx.arch.core:core-testing:$rootProject.archTestingVersion"
+
+
+    testImplementation "androidx.arch.core:core-testing:$rootProject.archTestingVersion"
+    testImplementation "androidx.test:core-ktx:$rootProject.androidXTestCoreVersion"
+    testImplementation "androidx.test.ext:junit-ktx:$rootProject.androidXTestExtKotlinRunnerVersion"
+    testImplementation "androidx.test:rules:$rootProject.androidXTestRulesVersion"
+    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$rootProject.coroutinesVersion"
+    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$rootProject.coroutinesVersion"
+    testImplementation "org.mockito:mockito-android:$rootProject.mockitoVersion"
+    testImplementation "org.robolectric:robolectric:$rootProject.robolectricVersion"
     testImplementation "junit:junit:$rootProject.junitVersion"
+    testImplementation "com.squareup.okhttp3:mockwebserver:$rootProject.mockWebServerVersion"
+    testImplementation "androidx.room:room-testing:$roomVersion"
+
+
+    // Once https://issuetracker.google.com/127986458 is fixed this can be testImplementation
+    debugImplementation "androidx.fragment:fragment-testing:$rootProject.fragmentVersion"
+    implementation "androidx.fragment:fragment:$fragmentVersion"
+    implementation "androidx.test:core:$androidXTestCoreVersion"
 
 
 }

@@ -1,42 +1,19 @@
 package com.developerkurt.gamedatabase.viewmodels
 
-import android.app.Application
+
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.asLiveData
-import com.developerkurt.gamedatabase.data.BaseRepository
-import com.developerkurt.gamedatabase.data.GameRepository
+import androidx.lifecycle.ViewModel
 import com.developerkurt.gamedatabase.data.model.GameData
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.launch
-import javax.inject.Inject
+import com.developerkurt.gamedatabase.data.source.GameRepository
+import com.developerkurt.gamedatabase.data.source.Result
 
-class GameListViewModel @ViewModelInject @Inject internal constructor(
-        application: Application,
-        private val gameRepository: GameRepository) : BaseViewModel(application)
+
+class GameListViewModel @ViewModelInject internal constructor(private val gameRepository: GameRepository) : ViewModel()
 {
-    private val gameListLiveData = MutableLiveData<List<GameData>>()
-    val dataStateLiveData: LiveData<BaseRepository.DataState> = gameRepository.gameDataStateFlow().asLiveData(coroutineContext)
+    var isViewPagerCreationHandled = false
+    var viewPagerPosition = 0
+    var searchedTerm = ""
 
-
-    fun getGameListLiveData(): LiveData<List<GameData>> = gameListLiveData
-
-
-    fun getLatestGameList()
-    {
-        launch {
-            gameRepository.startGettingGameDataUpdates()
-
-        }
-
-        launch {
-            gameRepository.getGameDataFlow().filterNotNull().collect {
-                gameListLiveData.value = it
-            }
-        }
-
-    }
-
+    suspend fun getGameListResultLiveData(): LiveData<Result<List<GameData>>> = gameRepository.observeGameDataList()
 }

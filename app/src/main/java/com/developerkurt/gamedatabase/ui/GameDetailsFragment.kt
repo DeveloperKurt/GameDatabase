@@ -15,6 +15,7 @@ import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.developerkurt.gamedatabase.GlideApp
 import com.developerkurt.gamedatabase.R
+import com.developerkurt.gamedatabase.data.source.Result
 import com.developerkurt.gamedatabase.databinding.GameDetailsFragmentMotionSceneStartBinding
 import com.developerkurt.gamedatabase.viewmodels.GameDetailsViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -36,7 +37,12 @@ class GameDetailsFragment : BaseDataFragment(), View.OnClickListener
     {
         _binding = GameDetailsFragmentMotionSceneStartBinding.inflate(inflater, container, false)
         val view = binding.root
-        (requireActivity() as MainActivity).hideBottomNavBar()
+
+        if (requireActivity() is MainActivity)
+        {
+            (requireActivity() as MainActivity).hideBottomNavBar()
+        }
+
         return view
     }
 
@@ -47,21 +53,20 @@ class GameDetailsFragment : BaseDataFragment(), View.OnClickListener
 
         binding.tvDescription.setMovementMethod(ScrollingMovementMethod())
 
-        viewModel.getDataStateLiveData().observe(viewLifecycleOwner, {
-            handleDataStateChange(it)
-        })
 
         viewModel.getIsFavoriteLiveData().observe(viewLifecycleOwner, {
             setUIFavoriteState(it)
         })
 
-        viewModel.getGameDetailsLiveData(viewModel.gameId).observe(viewLifecycleOwner, {
-            if (it != null)
+        viewModel.getGameDetailsResultLiveData(viewModel.gameId).observe(viewLifecycleOwner, {
+            if (it is Result.Success)
             {
-                binding.gameDetails = it
+                binding.gameDetails = it.data
 
                 // changeBackgroundToDominantImageColor(it.imageUrl)
             }
+
+            handleDataStateChange(it)
 
         })
 

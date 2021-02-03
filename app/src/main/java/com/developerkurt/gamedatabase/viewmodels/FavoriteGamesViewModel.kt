@@ -1,41 +1,30 @@
 package com.developerkurt.gamedatabase.viewmodels
 
-import android.app.Application
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.asLiveData
-import com.developerkurt.gamedatabase.data.BaseRepository
-import com.developerkurt.gamedatabase.data.GameRepository
+import androidx.lifecycle.Transformations
+import androidx.lifecycle.ViewModel
 import com.developerkurt.gamedatabase.data.model.GameData
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.launch
-import javax.inject.Inject
+import com.developerkurt.gamedatabase.data.source.GameRepository
+import com.developerkurt.gamedatabase.data.source.Result
 
-class FavoriteGamesViewModel @ViewModelInject @Inject internal constructor(
-        application: Application,
-        private val gameRepository: GameRepository) : BaseViewModel(application)
+class FavoriteGamesViewModel @ViewModelInject internal constructor(private val gameRepository: GameRepository) : ViewModel()
 {
-    private val favoriteGameListLiveData = MutableLiveData<List<GameData>>()
-    val dataStateLiveData: LiveData<BaseRepository.DataState> = gameRepository.gameDataStateFlow().asLiveData(coroutineContext)
 
-    fun getFavoriteGameListLiveData(): LiveData<List<GameData>> = favoriteGameListLiveData
-
-    fun fetchTheList()
+    suspend fun getFavoriteGameListResultLiveData(): LiveData<Result<List<GameData>>>
     {
 
-        launch {
-            gameRepository.startGettingGameDataUpdates()
-
-        }
-
-        launch {
-            gameRepository.getGameDataFlow().filterNotNull().collect {
-                favoriteGameListLiveData.value = it.filter { it.isInFavorites }
+        return Transformations.map(gameRepository.observeGameDataList(), {
+            return@map if (it is Result.Success)
+            {
+                Result.Success(it.data.filter { it.isInFavorites })
             }
-        }
-
+            else
+            {
+                it
+            }
+        })
     }
+
 
 }

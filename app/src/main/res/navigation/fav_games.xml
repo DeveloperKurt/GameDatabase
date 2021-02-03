@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/fav_games"
+    app:startDestination="@id/favoriteGamesFragment">
+
+    <fragment
+        android:id="@+id/favoriteGamesFragment"
+        android:name="com.developerkurt.gamedatabase.ui.FavoriteGamesFragment"
+        android:label="FavoriteGamesFragment"
+        tools:layout="@layout/favorite_games_fragment">
+        <action
+            android:id="@+id/action_favoriteGamesFragment_to_gameDetailsFragment"
+            app:destination="@id/gameDetailsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/gameDetailsFragment"
+        android:name="com.developerkurt.gamedatabase.ui.GameDetailsFragment"
+        android:label="GameDetailsFragment"
+        tools:layout="@layout/game_details_fragment_motion_scene_end">
+        <argument
+            android:name="gameId"
+            app:argType="integer" />
+        <argument
+            android:name="isInFavorites"
+            app:argType="boolean" />
+    </fragment>
+</navigation>

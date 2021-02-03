@@ -9,10 +9,11 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import com.developerkurt.gamedatabase.adapters.GameListAdapter
 import com.developerkurt.gamedatabase.data.model.GameData
+import com.developerkurt.gamedatabase.data.source.Result
 import com.developerkurt.gamedatabase.databinding.FavoriteGamesFragmentBinding
 import com.developerkurt.gamedatabase.viewmodels.FavoriteGamesViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.launch
+import timber.log.Timber
 
 @AndroidEntryPoint
 class FavoriteGamesFragment : BaseDataFragment(), GameListAdapter.GameClickListener
@@ -23,6 +24,8 @@ class FavoriteGamesFragment : BaseDataFragment(), GameListAdapter.GameClickListe
     // This property is only valid between onCreateView and onDestroyView.
     private var _binding: FavoriteGamesFragmentBinding? = null
     private val binding get() = _binding!!
+
+    private lateinit var gameListAdapter: GameListAdapter
 
     override fun onCreateView(
             inflater: LayoutInflater, container: ViewGroup?,
@@ -36,26 +39,44 @@ class FavoriteGamesFragment : BaseDataFragment(), GameListAdapter.GameClickListe
     override fun onViewCreated(view: View, savedInstanceState: Bundle?)
     {
         super.onViewCreated(view, savedInstanceState)
-        (requireActivity() as MainActivity).displayBottomNavBar()
+        if (requireActivity() is MainActivity)
+        {
+            (requireActivity() as MainActivity).displayBottomNavBar()
+        }
 
-        val gameListAdapter = GameListAdapter(this)
+        gameListAdapter = GameListAdapter(this)
         binding.recyclerViewFavoriteGames.adapter = gameListAdapter
 
+    }
+
+
+    override fun onResume()
+    {
+        super.onResume()
         setupUI(gameListAdapter)
     }
 
     private fun setupUI(gameListAdapter: GameListAdapter)
     {
-        viewModel.getFavoriteGameListLiveData().observe(viewLifecycleOwner, {
-            gameListAdapter.updateList(it)
-        })
+        lifecycleScope.launchWhenStarted {
+            viewModel.getFavoriteGameListResultLiveData().observe(viewLifecycleOwner, { result ->
+                if (activity != null)
+                {
+                    requireActivity().runOnUiThread {
+                        if (result is Result.Success)
+                        {
 
-        viewModel.dataStateLiveData.observe(viewLifecycleOwner, {
-            handleDataStateChange(it)
-        })
+                            gameListAdapter.updateList(result.data)
 
-        lifecycleScope.launch {
-            viewModel.fetchTheList()
+                        }
+                        else
+                        {
+                            Timber.w("FragmentActivity was null, couldn't update the views' data")
+                        }
+                        handleDataStateChange(result)
+                    }
+                }
+            })
         }
     }
 
@@ -97,7 +118,9 @@ class FavoriteGamesFragment : BaseDataFragment(), GameListAdapter.GameClickListe
 
     private fun navigateToGameDetails(gameData: GameData)
     {
+
         val direction = FavoriteGamesFragmentDirections.actionFavoriteGamesFragmentToGameDetailsFragment(gameData.id, gameData.isInFavorites)
         binding.root.findNavController().navigate(direction)
+
     }
 }
