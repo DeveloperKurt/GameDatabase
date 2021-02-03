@@ -53,12 +53,6 @@ Every I/O operation is done through coroutines and their lifecycle is managed by
 * Palette
 
 
-## Note
-
-**The tests are not written at the moment but of course, in the following days, both the UI and logic will be well tested.**
-
-
-
 
 ## License
 [APACHE 2.0](https://apache.org/licenses/LICENSE-2.0)
