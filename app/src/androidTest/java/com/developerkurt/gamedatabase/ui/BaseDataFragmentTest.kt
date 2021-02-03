@@ -17,9 +17,9 @@ import com.developerkurt.gamedatabase.data.source.Result
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mock
 import org.mockito.Mockito.*
 import org.mockito.MockitoAnnotations
+import org.mockito.Spy
 import kotlin.reflect.KFunction
 
 
@@ -28,7 +28,7 @@ import kotlin.reflect.KFunction
 class BaseDataFragmentTest
 {
 
-    @Mock lateinit var mockBaseDataFragment: TestBaseDataFragmentImp
+    @Spy lateinit var mockBaseDataFragment: TestBaseDataFragmentImp
 
     private val context = InstrumentationRegistry.getInstrumentation().getTargetContext()
     private val failedToUpdateToastString: String = context.resources.getString(R.string.data_update_fail)
@@ -53,14 +53,14 @@ class BaseDataFragmentTest
     @UiThreadTest
     fun handlingTheFAILED_TO_UPDATEStateProperly()
     {
-        val mockitoSpy = spy(TestBaseDataFragmentImp::class.java)
-        doNothing().`when`(mockitoSpy).showFailedToUpdateSnackBar()
+
+        doNothing().`when`(mockBaseDataFragment).showFailedToUpdateSnackBar()
         mockBaseDataFragment.handleDataStateChange(Result.FailedToUpdate)
         assertInvocationTimesForResultCallbacks(Result.FailedToUpdate)
     }
 
     @Test
-    fun handlingTheFAILEStateProperly()
+    fun handlingTheFAILEDStateProperly()
     {
         mockBaseDataFragment.handleDataStateChange(Result.Error())
         assertInvocationTimesForResultCallbacks(Result.Error())
