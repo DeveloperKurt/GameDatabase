@@ -2,6 +2,7 @@ package com.developerkurt.gamedatabase.data.source.remote.api
 
 import com.developerkurt.gamedatabase.BuildConfig
 import okhttp3.OkHttpClient
+import okhttp3.Request
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -24,6 +25,14 @@ class DefaultGameAPIServiceGenerator(
             .connectTimeout(timeoutInSeconds, TimeUnit.SECONDS)
             .readTimeout(timeoutInSeconds, TimeUnit.SECONDS)
             .writeTimeout(timeoutInSeconds, TimeUnit.SECONDS)
+            .addInterceptor { chain ->
+                //Add the auth key as a default query to every request
+                val urlWithAuthKey = chain.request().url.newBuilder().addQueryParameter("key", DefaultGameAPIService.AUTH_KEY).build()
+                val request: Request = chain.request().newBuilder().url(urlWithAuthKey).build()
+
+                return@addInterceptor chain.proceed(request)
+
+            }
 
 
         if (BuildConfig.DEBUG)
