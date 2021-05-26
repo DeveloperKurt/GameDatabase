@@ -15,10 +15,11 @@ buildscript {
         targetSdkVersion = 30
 
         // App dependencies
-        appCompatVersion = '1.1.0'
+        appCompatVersion = '1.2.0'
         archTestingVersion = '2.1.0'
         assistedInjectVersion = '0.5.2'
         constraintLayoutVersion = '2.0.0-beta3'
+        coreKtxVersion = "1.3.2"
         coreTestingVersion = '1.3.0'
         coroutinesVersion = "1.3.0-M2"
         espressoVersion = '3.3.0'
