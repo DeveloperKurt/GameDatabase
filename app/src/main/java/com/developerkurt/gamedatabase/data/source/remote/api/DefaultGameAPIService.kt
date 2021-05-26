@@ -25,6 +25,6 @@ interface DefaultGameAPIService
     {
         private const val HEADER_KEY = "x-rapidapi-key:8ca4ee9d44msh7419ea658215022p1a3ca0jsna719390dd548"
         private const val HEADER_HOST = "x-rapidapi-host:rawg-video-games-database.p.rapidapi.com"
-
+        const val AUTH_KEY = "86df052c75d548fab9f71a36a38c23ec"
     }
 }
