@@ -10,7 +10,7 @@
         <item name="colorSecondaryVariant">#141414</item>
         <item name="colorOnSecondary">#FFFFFF</item>
 
-        <item name="colorSurface">#F2F2F2</item>
+        <item name="colorSurface">#f2925d</item>
         <item name="colorOnSurface">#5B5B5B</item>
 
         <!-- Status bar color. -->
