@@ -11,6 +11,52 @@ A Kotlin app made using the best practices, most recent Jetpack libraries, and K
 ![Light Theme](https://i.imgur.com/2Bul95F.png)
 
 
+# Game Database - Library Usage
+
+
+<img align="left" width="426" height="893"  src="https://i.imgur.com/5aLiw84.png" alt="">  
+<img align="center" width="426" height="893"  src="https://i.imgur.com/gFoZxIp.png" alt="">  
+
+<br>
+
+To add a FloatingActionButton that opens up a Dialog which displays the installation date (persistent), current time (dynamic) and a downloaded image, add the code below to your project.
+
+<br>
+
+**Root Gradle:**
+
+    allprojects {
+    		repositories {
+    			maven { url 'https://jitpack.io' }
+    		}
+    	}
+
+**App Gradle**
+
+```css
+	dependencies {
+	        implementation 'com.github.DeveloperKurt:GameDatabase:2.1'
+	}
+```
+
+**Activity**
+
+    override fun onCreate(savedInstanceState: Bundle?)  
+    {  
+    	super.onCreate(savedInstanceState)
+      
+    	Module(this)
+    }
+
+
+
+**Customize the Theme by Adding Attributes:**
+
+ - **colorSecondary**: FloatingActionButton background
+ - **colorOnSecondary**: FloatingActionButton's icon color
+ - **colorSecondary**: FloatingActionButton background
+ - **colorSurface**: Dialog's background color
+
 
 ## Code Structure
 
@@ -33,6 +79,7 @@ Every I/O operation is done through coroutines and their lifecycle is managed by
 * Day/Night Theme
 * Data and view binding
 * Single Activity  pattern with the Navigation Component
+* Creating an Android library
 
 
 
