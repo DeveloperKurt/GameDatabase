@@ -50,12 +50,17 @@ dependencies {
     implementation "androidx.core:core-ktx:$rootProject.coreKtxVersion"
     implementation "androidx.appcompat:appcompat:$appCompatVersion"
     implementation "com.google.android.material:material:$rootProject.materialVersion"
+    implementation "androidx.datastore:datastore-preferences:$rootProject.dataStoreVersion"
     implementation "androidx.constraintlayout:constraintlayout:$constraintLayoutVersion"
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:$rootProject.lifecycleVersion"
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:$rootProject.lifecycleVersion"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$rootProject.lifecycleVersion"
+    implementation "com.github.bumptech.glide:glide:$rootProject.glideVersion"
+    annotationProcessor "com.github.bumptech.glide:compiler:$rootProject.glideVersion"
+
+
     testImplementation "junit:junit:$rootProject.junitVersion"
 
     androidTestImplementation "androidx.test:core-ktx:$rootProject.androidXTestCoreVersion"

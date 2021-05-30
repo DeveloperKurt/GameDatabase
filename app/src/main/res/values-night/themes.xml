@@ -6,9 +6,9 @@
         <item name="colorPrimaryVariant">#171717</item>
         <item name="colorOnPrimary">#000000</item>
         <!-- Secondary brand color. -->
-        <item name="colorSecondary">#E0E0E0</item>
-        <item name="colorSecondaryVariant">#fff</item>
-        <item name="colorOnSecondary">#000000</item>
+        <item name="colorSecondary">#1A1A1A</item>
+        <item name="colorSecondaryVariant">#000000</item>
+        <item name="colorOnSecondary">#E0E0E0</item>
 
         <item name="colorSurface">#1A1A1A</item>
         <item name="colorOnSurface">#B3B3B3</item>

@@ -3,6 +3,7 @@ package com.developerkurt.gamedatabase.ui
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import com.developerkurt.developerkurtmodule.Module
 import com.developerkurt.gamedatabase.R
 import com.developerkurt.gamedatabase.databinding.ActivityMainBinding
 import com.developerkurt.gamedatabase.util.setupWithNavController
@@ -25,6 +26,9 @@ class MainActivity : AppCompatActivity()
         {
             setupBottomNavigationBar()
         } // Else, need to wait for onRestoreInstanceState
+
+        Module(this)
+
     }
 
 

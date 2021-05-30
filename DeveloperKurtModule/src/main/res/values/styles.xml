@@ -1,11 +1,11 @@
 <resources>
 
 
-    <style name="Dialog" parent="Theme.MaterialComponents.Dialog">
+    <style name="ModuleDialog" parent="Theme.MaterialComponents.Dialog">
         <item name="android:windowBackground">@drawable/dialog_background</item>
         <item name="android:windowAnimationStyle">@style/DialogAnimation</item>
         <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">@dimen/dialogHeight</item>
+        <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_gravity">center</item>
     </style>
 

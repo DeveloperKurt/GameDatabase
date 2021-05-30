@@ -11,7 +11,7 @@ class MainApplication : Application()
     /**
      * ## Set to true to force the dark mode. Might come in handy if your android version doesn't support the night mode.
      */
-    private val forceDarkMode = false
+    private val forceDarkMode = true
 
 
     override fun onCreate()
