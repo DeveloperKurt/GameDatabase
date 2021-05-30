@@ -22,18 +22,25 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 
-internal class ModuleDialog(private val activity: Activity)
+class ModuleDialog internal constructor(private val activity: Activity)
 {
-    private val KEY_INSTALLATION_DATE = stringPreferencesKey("installation_date")
+
+    companion object
+    {
+        val KEY_MODULE_INSTALLATION_DATE = stringPreferencesKey("installation_date")
+
+        //Keep these as lambdas in order to prevent a bug that occurs when user changes the Locale whilst the app is running
+        val installationDateFormat = { SimpleDateFormat("dd MM yyyy", Locale.getDefault()) }
+        val currentDateFormat = { SimpleDateFormat("HH:mm:ss, dd MM yyyy", Locale.getDefault()) }
+    }
+
 
     private val alertDialog: AlertDialog
 
     private val installationDateFlow: Flow<String> = activity.applicationContext.dataStore.data
-        .map { preferences -> preferences[KEY_INSTALLATION_DATE] ?: "" }
+        .map { preferences -> preferences[KEY_MODULE_INSTALLATION_DATE] ?: "" }
 
     private var installationDate: String = runBlocking { installationDateFlow.first() }
-    private val installationDateFormat: SimpleDateFormat = SimpleDateFormat("dd MM yyyy", Locale.getDefault())
-    private val currentDateFormat: SimpleDateFormat = SimpleDateFormat("HH:mm:ss, dd MM yyyy", Locale.getDefault())
 
 
     private val currentDateFormatTv: TextView
@@ -46,8 +53,8 @@ internal class ModuleDialog(private val activity: Activity)
     {
         val builder: AlertDialog.Builder = AlertDialog.Builder(activity, R.style.ModuleDialog)
         val dialogView: View = activity.getLayoutInflater().inflate(R.layout.module_dialog, null)
-        installationDateTv = dialogView.findViewById(R.id.tv_installation_date)
-        currentDateFormatTv = dialogView.findViewById(R.id.tv_current_date)
+        installationDateTv = dialogView.findViewById(R.id.module_tv_installation_date)
+        currentDateFormatTv = dialogView.findViewById(R.id.module_tv_current_date)
         iconImageView = dialogView.findViewById(R.id.iv_module)
 
         builder.setView(dialogView)
@@ -100,7 +107,7 @@ internal class ModuleDialog(private val activity: Activity)
             {
                 if (!activity.isDestroyed && alertDialog.isShowing)
                 {
-                    currentDateFormatTv.text = currentDateFormat.format(Calendar.getInstance().time)
+                    currentDateFormatTv.text = currentDateFormat().format(Calendar.getInstance().time)
                     handler.postDelayed(this, 1000)
                 }
             }
@@ -113,9 +120,9 @@ internal class ModuleDialog(private val activity: Activity)
         if (installationDate.isEmpty())
         {
             runBlocking {
-                installationDate = installationDateFormat.format(Calendar.getInstance().time)
+                installationDate = installationDateFormat().format(Calendar.getInstance().time)
                 activity.applicationContext.dataStore.edit {
-                    it[KEY_INSTALLATION_DATE] = installationDate
+                    it[KEY_MODULE_INSTALLATION_DATE] = installationDate
                 }
             }
         }
