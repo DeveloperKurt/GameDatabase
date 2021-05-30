@@ -6,6 +6,7 @@ import com.developerkurt.gamedatabase.data.LocalGameDataSource
 import com.developerkurt.gamedatabase.data.RemoteGameDataSource
 import com.developerkurt.gamedatabase.data.model.GameData
 import com.developerkurt.gamedatabase.data.model.GameDetails
+import com.developerkurt.gamedatabase.util.stripHtml
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -223,7 +224,17 @@ class DefaultGameRepository(
         }
     }
 
-    override suspend fun getGameDetails(gameId: Int): Result<GameDetails> = remoteDataSource.getGameDetails(gameId)
+    override suspend fun getGameDetails(gameId: Int): Result<GameDetails>
+    {
+        val result = remoteDataSource.getGameDetails(gameId)
+
+        if (result is Result.Success)
+        {
+            result.data.description = result.data.description.stripHtml()
+        }
+
+        return result
+    }
 
     override suspend fun updateIsFavorite(gameId: Int, isFavorite: Boolean) =
         localGameDataSource.updateIsFavorite(gameId, if (isFavorite) 1 else 0)

@@ -12,6 +12,7 @@ fun String.stripHtml(): String
     }
     else
     {
+        @Suppress("DEPRECATION")
         Html.fromHtml(this).toString()
     }
 }
