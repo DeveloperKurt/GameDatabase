@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="info_icon">Info icon</string>
+    <string name="library_installed_on">Library installed on %1$s</string>
+    <string name="current_time">Current Time:</string>
+    <string name="module_image">Module Image</string>
+</resources>
