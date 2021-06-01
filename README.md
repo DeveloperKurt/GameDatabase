@@ -14,8 +14,8 @@ A Kotlin app made using the best practices, most recent Jetpack libraries, and K
 # Game Database - Library Usage
 
 
-<img align="left" width="426" height="893"  src="https://i.imgur.com/5aLiw84.png" alt="">  
-<img align="center" width="426" height="893"  src="https://i.imgur.com/gFoZxIp.png" alt="">  
+<img align="left" width="384" height="804"  src="https://i.imgur.com/5aLiw84.png" alt="">  
+<img align="center" width="384" height="804"  src="https://i.imgur.com/gFoZxIp.png" alt="">  
 
 <br>
 
