@@ -52,9 +52,8 @@ To add a FloatingActionButton that opens up a Dialog which displays the installa
 
 **Customize the Theme by Adding Attributes:**
 
- - **colorSecondary**: FloatingActionButton background
+ - **colorSecondary**: FloatingActionButton's background color
  - **colorOnSecondary**: FloatingActionButton's icon color
- - **colorSecondary**: FloatingActionButton background
  - **colorSurface**: Dialog's background color
 
 
