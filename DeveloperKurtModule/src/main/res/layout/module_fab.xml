@@ -12,4 +12,6 @@
     app:borderWidth="0dp"
     app:fabSize="normal"
     app:maxImageSize="50dp"
+    app:backgroundTint="?attr/colorSecondary"
+    app:rippleColor="?attr/colorOnSecondary"
     app:useCompatPadding="true" />
